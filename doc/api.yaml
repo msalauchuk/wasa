@@ -100,6 +100,8 @@ paths:
           $ref: '#/components/responses/notFound'
         500:
           $ref: '#/components/responses/internalServerError'
+      security:
+        - bearerAuth: []
     put:
       tags: [User]
       summary: Update user nickname
@@ -123,13 +125,15 @@ paths:
           $ref: '#/components/responses/notFound'
         500:
           $ref: '#/components/responses/internalServerError'
+      security:
+        - bearerAuth: []
 
   /users/{id}/home:
     parameters:
       - $ref: '#/components/parameters/userId'
 
     get:
-      tags: [ "stream" ]
+      tags: [Feed]
       summary: Obtain the stream
       description: Get all the photos (stream) from the following users
       operationId: getMyStream
@@ -173,30 +177,9 @@ paths:
           $ref: '#/components/responses/badRequest'
         500:
           $ref: '#/components/responses/internalServerError'
+      security:
+        - bearerAuth: []
 
-  /photos:
-    post:
-      tags: [Photo]
-      summary: Upload a new photo
-      operationId: uploadPhoto
-      requestBody:
-        required: true
-        content:
-          multipart/form-data:
-            schema:
-              type: object
-              properties:
-                photo:
-                  type: string
-                  format: binary
-                  description: "Upload photo file."
-      responses:
-        201:
-          $ref: '#/components/responses/photoUploaded'
-        400:
-          $ref: '#/components/responses/badRequest'
-        500:
-          $ref: '#/components/responses/internalServerError'
 
   /users/{id}/photos/{photo_id}:
     delete:
@@ -350,6 +333,8 @@ paths:
           $ref: '#/components/responses/noContent'
         401:
           $ref: '#/components/responses/unauthorized'
+      security:
+        - bearerAuth: []
     delete:
       tags: [Social]
       summary: Unfollow a user
@@ -359,6 +344,8 @@ paths:
           $ref: '#/components/responses/noContent'
         401:
           $ref: '#/components/responses/unauthorized'
+      security:
+        - bearerAuth: []
 
   /users/{userId}/banned_users/{bannedId}:
     put:
@@ -381,6 +368,9 @@ paths:
         401:
           $ref: '#/components/responses/unauthorized'
 
+      security:
+        - bearerAuth: []
+
     delete:
       tags: [ User ]
       summary: Unban a user
@@ -400,6 +390,9 @@ paths:
           $ref: '#/components/responses/notFound'
         401:
           $ref: '#/components/responses/unauthorized'
+
+      security:
+        - bearerAuth: []
 
 components:
   parameters:
