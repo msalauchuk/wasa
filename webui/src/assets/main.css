@@ -1,0 +1,54 @@
+@font-face {
+	font-family: 'aBold'; /* A custom name for your font-family */
+	src: url('./f/AeonikProTRIAL-Bold.otf') format('opentype');
+	font-weight: bold; /* As it's a bold font, specifying the weight helps with proper application */
+	font-style: normal; /* This font is not italic, so we set style to normal */
+}
+@font-face {
+	font-family: 'aReg';
+	src: url('./f/AeonikProTRIAL-Regular.otf') format('opentype');
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'title';
+	src: url('./f/title.otf') format('opentype');
+	font-style: normal;
+}
+
+:root {
+    --color-text: gainsboro;
+    --color-red-danger: rgb(207, 8, 8);
+}
+
+html {
+    height: 100%;
+}
+
+main {
+    height: 100vh;
+}
+
+body {
+	background: linear-gradient(
+		to bottom, /* Gradient direction */
+		rgb(121, 222, 253) 0%, /* Significantly lighter shade at the top */
+		rgb(21, 182, 243) 50%, /* Original color in the middle */
+		rgb(4, 95, 150) 150% /* Significantly darker shade at the bottom */
+	);
+	height: 100vh; /* This makes sure the gradient covers the whole viewport height */
+	margin: 0; /* Removes default margin */
+    font-family: "ABold", "aReg";
+    color: black;
+    /* 'Times New Roman', Times, serif */
+
+}
+
+.user {
+    background-color: azure;
+}
+
+.my-trnsp-btn {
+    border: none;
+    background: transparent;
+}
