@@ -83,10 +83,10 @@ paths:
           $ref: '#/components/responses/internalServerError'
 
       security:
-        - bearerAuth: [ ]
+        - bearerAuth: []
 
 
-  /users/{userId}:
+  /users/{id}:
     parameters:
       - $ref: '#/components/parameters/userId'
     get:
@@ -151,8 +151,8 @@ paths:
           $ref: "#/components/responses/internalServerError"
 
       security:
-        - bearerAuth: [ ]
-  /users/{userId}/photos:
+        - bearerAuth: []
+  /users/{id}/photos:
     post:
       tags: [ Photo ]
       summary: Upload a new photo for a user
@@ -320,7 +320,7 @@ paths:
       security:
         - bearerAuth: []
 
-  /users/{userId}/followers/{followerId}:
+  /users/{id}/followers/{followerId}:
     parameters:
       - $ref: '#/components/parameters/userId'
       - $ref: '#/components/parameters/followerId'
@@ -347,7 +347,7 @@ paths:
       security:
         - bearerAuth: []
 
-  /users/{userId}/banned_users/{bannedId}:
+  /users/{id}/banned_users/{bannedId}:
     put:
       tags: [ User ]
       summary: Ban a user
@@ -397,13 +397,14 @@ paths:
 components:
   parameters:
     userId:
-      name: userId
+      name: id
       in: path
       description: unique id
       required: true
       schema:
         description: between 3-16 chars
         type: string
+        pattern: '^.*?$'
         example: "user123"
         minLength: 3
         maxLength: 16
