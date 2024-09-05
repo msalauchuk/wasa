@@ -4,6 +4,8 @@ export default {
 		return {
 			errormsg: null,
 			nickname: "",
+			successmsg: null,  //success message
+
 		}
 	},
 
@@ -17,6 +19,7 @@ export default {
 		async modifyNickname(){
 			if (!this.isValidNickname(this.nickname)) {
 				this.errormsg = "Invalid nickname. Please ensure it is between 3 and 16 characters long.";
+				this.successmsg = null;
 				return;
 			}
 			try{
@@ -26,11 +29,13 @@ export default {
 				});
 				if (response.status === 200) {
 					this.nickname = ""; // Clear the input after successful update
-					alert("Nickname updated successfully!"); // Simple success alert
+					this.successmsg = "Nickname updated successfully!";
+					this.errormsg = null;
 				}
 
 			} catch (e){
 				this.errormsg = e.toString();
+				this.successmsg = null;
 			}
 		},
 	},
@@ -46,16 +51,9 @@ export default {
 			</div>
 		</div>
 
-		<div class="row">
-			<div class="col-12 d-flex justify-content-center">
-				<p class="me-1" style="color: var(--color-red-danger);">[Disclaimer] </p>
-				<p> Your user handle is structured as <span class="ms-1 me-1" style="color: green;">nickname</span>@identifier. </p>
-			</div>
-			<div class="col-12 d-flex justify-content-center">
-				<p>You can only modify the <span class="ms-1 me-1" style="color: green;">nickname</span> (before the "@") and not the identifier (after the "@").</p>
-			</div>
-			<div class="col-12 d-flex justify-content-center">
-				<p>Note: 'Username' is synonymous with 'nickname' and refers to the same attribute.</p>
+		<div class="row text-center">
+			<div class="col-12">
+				<p class="mt-2">Please note, you can only change the <span class="text-success">nickname</span> (the part before "@"). The <span class="fw-bold">identifier</span> (the part after "@") is fixed and cannot be altered.</p>
 			</div>
 		</div>
 
@@ -81,12 +79,22 @@ export default {
 			</div>
 		</div>
 
+		<!-- Display success message -->
+		<div class="row" v-if="successmsg">
+			<div class="col d-flex justify-content-center">
+				<div class="alert alert-success">{{ successmsg }}</div>
+			</div>
+		</div>
+
+		<!-- Display nickname preview -->
 		<div class="row">
 			<div v-if="nickname.trim().length > 0" class="col d-flex justify-content-center">
 				Preview: {{ nickname }} @{{ this.$route.params.id }}
 			</div>
 		</div>
 
+
+		<!-- Display error message -->
 		<div class="row">
 			<ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
 		</div>
