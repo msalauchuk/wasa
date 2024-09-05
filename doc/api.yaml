@@ -192,6 +192,7 @@ paths:
       - $ref: '#/components/parameters/userId'
       - $ref: '#/components/parameters/photoId'
     delete:
+      tags: [Photo]
       summary: Deletes a specific photo
       description: Deletes a photo belonging to a user. Requires user to be the photo owner
       operationId: deletePhoto
@@ -209,6 +210,8 @@ paths:
       security:
         - bearerAuth: []
     get:
+      tags: [ Photo ]
+
       summary: Retrieves a specific photo
       description: Retrieves detailed information about a specific photo of a user.
       operationId: getPhoto
@@ -371,7 +374,7 @@ paths:
   /users/{id}/banned_users/{bannedId}:
     parameters:
       - $ref: '#/components/parameters/userId'
-      - $ref: '#/components/parameters/banned_id'
+      - $ref: '#/components/parameters/bannedId'
 
 
     put:
@@ -432,7 +435,7 @@ components:
         maxLength: 16
         readOnly: true
     photoId:
-      name: photoId
+      name: photo_id
       in: path
       description: Unique identifier for a photo, used across various photo related endpoints
       required: true
@@ -470,8 +473,8 @@ components:
         type: string
         example: "Massimo123"
 
-    banned_id:
-      name: banned_user_id
+    bannedId:
+      name: bannedId
       in: path
       description: A banned user unique identifier. It's exactly the *identifier* of the user
       required: true
