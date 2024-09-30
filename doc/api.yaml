@@ -235,7 +235,7 @@ paths:
         - bearerAuth: []
 
 
-  /users/{id}/photos/{photoId}/likes/{like_id}:
+  /users/{id}/photos/{photo_id}/likes/{like_id}:
     parameters:
       - $ref: '#/components/parameters/userId'
       - $ref: '#/components/parameters/like_id'
@@ -278,7 +278,7 @@ paths:
       security:
         - bearerAuth: []
 
-  /users/{id}/photos/{photoId}/comments:
+  /users/{id}/photos/{photo_id}/comments:
     parameters:
       - $ref: '#/components/parameters/userId'
       - $ref: '#/components/parameters/photoId'
@@ -318,7 +318,7 @@ paths:
       security:
         - bearerAuth: []
 
-  /users/{id}/photos/{photoId}/comments/{commentId}:
+  /users/{id}/photos/{photo_id}/comments/{commentId}:
 
     parameters:
       - $ref: '#/components/parameters/userId'
