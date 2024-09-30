@@ -160,7 +160,7 @@ paths:
     post:
       tags: [ Photo ]
       summary: Upload a new photo for a user
-      operationId: uploadUserPhoto
+      operationId: uploadPhoto
       parameters:
         - $ref: '#/components/parameters/userId'
       requestBody:
