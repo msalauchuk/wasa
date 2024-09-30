@@ -41,8 +41,8 @@ paths:
                   minLength: 3
                   maxLength: 16
       responses:
-        200:
-          description: Successfully logged in
+        201:
+          description: User successfully registered or logged in
           content:
             application/json:
               schema:
@@ -424,59 +424,65 @@ components:
     userId:
       name: id
       in: path
-      description: unique id
+      description: Unique identifier for a user. It must be between 3 and 16 characters long.
       required: true
       schema:
-        description: between 3-16 chars
+        description: A unique user identifier that follows a specific pattern and length constraint.
         type: string
         pattern: '^.*?$'
         example: "user123"
         minLength: 3
         maxLength: 16
         readOnly: true
+
     photoId:
       name: photo_id
       in: path
-      description: Unique identifier for a photo, used across various photo related endpoints
+      description: Unique identifier for a photo, used in photo-related endpoints.
       required: true
       schema:
-        description: Int64 up to 9999
+        description: Integer identifier for a photo, ranging from 0 to 9999.
         type: integer
         format: int64
         example: 789
         minimum: 0
         maximum: 9999
         readOnly: true
+
     commentId:
       name: commentId
       in: path
-      description: A comment unique identifier
+      description: A unique identifier for a comment.
       required: true
       schema:
         type: integer
+        description: Integer identifier for a comment within a post, typically used to manage individual comments.
         example: 101
+
     followerId:
       name: followerId
       in: path
-      description: A follower's unique identifier.
+      description: Unique identifier for a follower of a user.
       required: true
       schema:
         type: string
+        description: Identifier for the user following another user.
         example: "user456"
 
     like_id:
       name: like_id
       in: path
-      description: A like unique identifier. *userId* of the user that liked the photo
+      description: Unique identifier for a "like", representing the user who liked the photo.
       required: true
       schema:
         type: string
+        description: The user ID of the person who liked the photo.
         example: "Massimo123"
 
     bannedId:
       name: bannedId
       in: path
-      description: A banned user unique identifier. It's exactly the *identifier* of the user
+      description: Unique identifier for a banned user, typically the username or ID of the banned user.
       required: true
       schema:
         $ref: "#/components/schemas/nickname/properties/nickname"
@@ -485,22 +491,22 @@ components:
     query_id:
       name: id
       in: query
-      description: id of the user that is being searched
+      description: Unique identifier of the user being searched. It must be between 3 and 16 characters long.
       schema:
         type: string
+        description: Identifier used for searching a specific user.
         minLength: 3
         maxLength: 16
         example: "maria123"
-      example: "maria123"
 
   schemas:
 
     nickname:
-      description: It's a user's nickname
+      description: It's a user's nickname schema used for profile identification.
       type: object
       properties:
         nickname:
-          description: User's nickname, allowing 3-16 characters
+          description: The nickname chosen by the user, allowing 3-16 characters.
           type: string
           minLength: 3
           maxLength: 16
@@ -508,58 +514,62 @@ components:
           example: "massimo123"
       example:
         nickname: "Massimo123"
+
     user:
       type: object
-      description: "Contains the unique identifier and nickname of a user."
+      description: Contains the unique identifier and nickname of a user.
       properties:
         user_id:
           type: string
-          description: "Unique identifier for the user."
+          description: A globally unique identifier for the user.
           example: "User2024"
         nickname:
           type: string
-          description: "Nickname of the user."
+          description: The nickname chosen by the user.
           example: "NatureLover"
+
     comment_identifier:
       type: object
-      description: "Unique identifier for a comment."
+      description: Unique identifier for a comment within the system.
       properties:
         comment_id:
           type: integer
-          description: "Any number between 0 and 9999 that uniquely identifies a comment."
+          description: Any number between 0 and 9999 that uniquely identifies a comment.
           format: int64
           minimum: 0
           maximum: 9999
           readOnly: true
           example: 256
+
     comment:
       type: object
-      description: "Details about a user's comment, including the text and the identifier of who commented."
+      description: Details about a user's comment, including the text and the identifier of who commented.
       properties:
         user_id:
           type: string
-          description: "Unique identifier of the user who made the comment."
+          description: The unique identifier of the user who made the comment.
           example: "User3030"
         nickname:
           type: string
-          description: "Nickname of the commenter."
+          description: The nickname of the user who made the comment.
           example: "StarGazer"
         comment:
           type: string
-          description: "Text of the comment."
+          description: The text content of the comment made by the user.
           minLength: 1
           maxLength: 300
           example: "This landscape is breathtaking!"
         comment_id:
           type: integer
-          description: "Unique identifier for the comment."
+          description: A unique identifier for the comment within the system.
           example: 991
+
     raw_photo:
-      description: Image content
+      description: Schema for raw photo data used for uploading and storing photos.
       type: object
       properties:
         photo_data:
-          description: "Raw data of the photo"
+          description: The binary data representing the photo.
           type: string
           minLength: 0
           maxLength: 100
@@ -567,45 +577,46 @@ components:
           example: "010110000"
       example:
         photo_data: "010110000"
+
     photo:
-      description: Contains the essential info of a photo
+      description: Contains essential information of a photo, including its metadata and interactions.
       type: object
       properties:
         comments:
-          description: Array of comments of a photo
+          description: An array of comments associated with the photo.
           type: array
           minItems: 0
           maxItems: 9999
           items:
             $ref: "#/components/schemas/comment"
         likes:
-          description:  List of users who liked the photo.
+          description: List of users who liked the photo.
           type: array
           minItems: 0
           maxItems: 9999
           items:
             $ref: "#/components/schemas/user"
         date:
-          description: Timestamp of when the photo was uploaded.
+          description: The timestamp indicating when the photo was uploaded.
           type: string
           format: date-time
           example: 2023-04-14T09:22:05Z
           readOnly: true
         photo_id:
           type: integer
-          description: "Unique identifier of the photo."
+          description: A unique identifier for the photo.
           example: 1045
         owner:
           type: string
-          description: "Nickname of the photo's owner."
+          description: The nickname of the user who uploaded the photo.
           example: "LensMaster"
 
     photos_list:
-      description: Represents a collection of photos.
+      description: Represents a collection of photos uploaded by different users.
       type: object
       properties:
         photos_list:
-          description: List of detailed photo entries.
+          description: A list containing detailed photo entries.
           type: array
           minItems: 0
           maxItems: 10
@@ -613,11 +624,11 @@ components:
             $ref: "#/components/schemas/photo"
 
     users_list:
-      description: List of users found
+      description: Represents a list of users matching the search criteria.
       type: object
       properties:
         users:
-          description: Array of users with a partial match on the searched nickname
+          description: An array of users whose nickname partially or fully matches the searched nickname.
           type: array
           minItems: 0
           maxItems: 10
@@ -630,38 +641,34 @@ components:
               nickname: Massimo12
 
     complete_profile:
-      description: Comprehensive profile information including user details and associated content.
+      description: Comprehensive profile information, including user details and associated content such as followers and photos.
       type: object
       properties:
-
         user_id:
           type: string
-          description: "Unique identifier for the user."
+          description: A unique identifier for the user.
           example: "Adventurer123"
         nickname:
           type: string
-          description: "Nickname of the user."
+          description: The nickname chosen by the user.
           example: "TrailBlazer"
-
         followers:
-          type: array
           description: List of users who follow this user.
+          type: array
           minItems: 0
           maxItems: 99
           items:
             $ref: "#/components/schemas/user"
-
         following:
-          description: List of users this user follows.
+          description: List of users that this user follows.
           type: array
           minItems: 0
           maxItems: 99
           items:
             $ref: "#/components/schemas/user"
-
         photos:
+          description: Photos uploaded by the user, including metadata and interactions.
           type: array
-          description: Photos uploaded by the user, each detailed with interactions and metadata.
           minItems: 0
           maxItems: 10
           items:
@@ -677,7 +684,6 @@ components:
             properties:
               message:
                 type: string
-                example: "Action successful"
     badRequest:
       description: Invalid request parameters or body
       content:
@@ -685,9 +691,15 @@ components:
           schema:
             type: object
             properties:
+              status:
+                type: integer
+                example: 400
               error:
                 type: string
                 example: "Invalid parameters"
+              details:
+                type: string
+                example: "The 'username' field is required."
     notFound:
       description: The requested resource was not found
       content:
@@ -695,9 +707,15 @@ components:
           schema:
             type: object
             properties:
+              status:
+                type: integer
+                example: 404
               error:
                 type: string
                 example: "Resource not found"
+              details:
+                type: string
+                example: "The user with ID 'user123' does not exist."
     unauthorized:
       description: Authorization required or authorization failed
       content:
@@ -705,21 +723,47 @@ components:
           schema:
             type: object
             properties:
+              status:
+                type: integer
+                example: 401
               error:
                 type: string
                 example: "Unauthorized access"
+              details:
+                type: string
+                example: "Bearer token is missing or invalid."
     forbidden:
-      description: Response associated to the 403 http status (Access denied )
-    internalServerError:
-      description: Internal Server Error
+      description: Access denied (403 Forbidden)
       content:
         application/json:
           schema:
             type: object
             properties:
+              status:
+                type: integer
+                example: 403
+              error:
+                type: string
+                example: "Access denied"
+              details:
+                type: string
+                example: "You do not have permission to view this resource."
+    internalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                example: 500
               error:
                 type: string
                 example: "Internal server error"
+              details:
+                type: string
+                example: "An unexpected error occurred on the server."
     userProfile:
       description: Returns the full profile of the user
       content:
@@ -727,12 +771,21 @@ components:
           schema:
             type: object
             properties:
+              status:
+                type: integer
+                example: 200
+              message:
+                type: string
+                example: "User profile retrieved successfully."
               userId:
                 type: string
                 example: "user123"
               nickname:
                 type: string
                 example: "Maria"
+              fullName:
+                type: string
+                example: "Maria Rossi"
     photoUploaded:
       description: Photo uploaded successfully
       content:
@@ -740,7 +793,16 @@ components:
           schema:
             type: object
             properties:
+              status:
+                type: integer
+                example: 201
+              message:
+                type: string
+                example: "Photo uploaded successfully."
               photoId:
+                type: string
+                example: "photo789"
+              url:
                 type: string
                 example: "photo789"
     feed:
