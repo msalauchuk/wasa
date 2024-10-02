@@ -1,44 +1,46 @@
 package database
 
-// Database function that retrieves the list of followers of a user
-func (db *appdbimpl) GetFollowers(requestinUser User) ([]User, error) {
+// GetFollowers retrieves the list of followers for a given user.
+// It returns a slice of User and an error, if any occurs.
+func (db *appdbimpl) GetFollowers(requestingUser User) ([]User, error) {
 
-	rows, err := db.c.Query("SELECT follower FROM followers WHERE followed = ?", requestinUser.IdUser)
+	// Execute the query to find all followers of the requested user.
+	rows, err := db.c.Query("SELECT follower FROM followers WHERE followed = ?", requestingUser.IdUser)
 	if err != nil {
 		return nil, err
 	}
-	// Wait for the function to finish before closing rows.
-	defer func() { _ = rows.Close() }()
+	defer func() { _ = rows.Close() }() // Ensure rows are closed properly.
 
-	// Read all the users in the resulset (users that follow the requesting user)
 	var followers []User
+
+	// Iterate over the result set and append each follower to the slice.
 	for rows.Next() {
-		var folower User
-		err = rows.Scan(&folower.IdUser)
-		if err != nil {
+		var follower User
+		if err = rows.Scan(&follower.IdUser); err != nil {
 			return nil, err
 		}
-		followers = append(followers, folower)
+		followers = append(followers, follower)
 	}
 
-	if rows.Err() != nil {
+	// Check if there was any error during the iteration.
+	if err = rows.Err(); err != nil {
 		return nil, err
 	}
 
 	return followers, nil
 }
 
-// Database function that retrieves the list of users followed by the user
+// GetFollowing retrieves the list of users that the given user is following.
+// It returns a slice of User and an error, if any occurs.
 func (db *appdbimpl) GetFollowing(requestinUser User) ([]User, error) {
 
 	rows, err := db.c.Query("SELECT followed FROM followers WHERE follower = ?", requestinUser.IdUser)
 	if err != nil {
 		return nil, err
 	}
-	// Wait for the function to finish before closing rows.
 	defer func() { _ = rows.Close() }()
 
-	// Read all the users in the resulset (users followed by the requesting user)
+	// Iterate over the result set and append each following to the slice.
 	var following []User
 	for rows.Next() {
 		var folowed User
@@ -56,7 +58,8 @@ func (db *appdbimpl) GetFollowing(requestinUser User) ([]User, error) {
 	return following, nil
 }
 
-// Database function that adds a follower to a user
+// FollowUser adds a new relationship where `follower` starts following `followed`.
+// It returns an error if the operation fails.
 func (db *appdbimpl) FollowUser(follower User, followed User) error {
 
 	_, err := db.c.Exec("INSERT INTO followers (follower,followed) VALUES (?, ?)",
@@ -68,7 +71,8 @@ func (db *appdbimpl) FollowUser(follower User, followed User) error {
 	return nil
 }
 
-// Database function that removes a follower from a user
+// UnfollowUser removes the relationship where `follower` is following `followed`.
+// It returns an error if the operation fails.
 func (db *appdbimpl) UnfollowUser(follower User, followed User) error {
 
 	_, err := db.c.Exec("DELETE FROM followers WHERE(follower = ? AND followed = ?)",
