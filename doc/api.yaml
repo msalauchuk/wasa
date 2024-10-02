@@ -92,6 +92,7 @@ paths:
       - $ref: '#/components/parameters/userId'
     get:
       tags: [User]
+      description: This endpoint retrieves the profile information of the user identified by the provided user ID. The response includes basic user details such as username, nickname, and other relevant profile information.
       summary: Retrieve user profile
       operationId: getUserProfile
       responses:
@@ -105,6 +106,7 @@ paths:
         - bearerAuth: []
     put:
       tags: [User]
+      description: This endpoint allows an authenticated user to update their nickname. The new nickname must meet the specified validation requirements, including length and format.
       summary: Update user nickname
       operationId: setMyUserName
       requestBody:
