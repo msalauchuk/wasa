@@ -8,50 +8,51 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-// Function that adds a user to the followers list of another
+// follow adds the requesting user to the followers list of another user.
+// The user cannot follow themselves, and if the user was banned by the target user, the follow action is forbidden.
 func (rt *_router) follow(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	userToFollowId := ps.ByName("id")
-	requestingUserId := extractBearer(r.Header.Get("Authorization"))
+	// Extract IDs from the request path and authorization header
+	targetUserId := ps.ByName("id")                                  // ID of the user to be followed
+	requestingUserId := extractBearer(r.Header.Get("Authorization")) // ID of the authenticated user
 
-	// users can't follow themselves
-	if requestingUserId == userToFollowId {
-		w.WriteHeader(http.StatusBadRequest)
+	// Users cannot follow themselves
+	if requestingUserId == targetUserId {
+		w.WriteHeader(http.StatusBadRequest) // 400 Bad Request: Can't follow oneself
 		return
 	}
 
 	// Check if the id of the follower in the request is the same of the bearer and the path parameter
 	if ps.ByName("follower_id") != requestingUserId {
 		w.WriteHeader(http.StatusBadRequest)
-		// ctx.Logger.WithError(errors.New("id in request and authentication not consistent")).Error("put-follow: users trying to identify as someone else")
 		return
 	}
 
-	// Check if the requesting user wasn't banned by the photo owner
+	// Check if the requesting user was banned by the target user
 	banned, err := rt.db.BannedUserCheck(
 		database.User{IdUser: requestingUserId},
-		database.User{IdUser: userToFollowId})
+		database.User{IdUser: targetUserId})
 	if err != nil {
-		ctx.Logger.WithError(err).Error("post-comment/rt.db.BannedUserCheck: error executing query")
-		w.WriteHeader(http.StatusInternalServerError)
+		ctx.Logger.WithError(err).Error("follow/db.BannedUserCheck: error executing query")
+		w.WriteHeader(http.StatusInternalServerError) // 500 Internal Server Error
 		return
 	}
+	// If the requesting user is banned, the follow action is forbidden
 	if banned {
-		// User was banned, can't perform the follow action
-		w.WriteHeader(http.StatusForbidden)
+		w.WriteHeader(http.StatusForbidden) // 403 Forbidden: User is banned
 		return
 	}
 
-	// Add the new follower in the db via db function
+	// Add the new follower to the database
 	err = rt.db.FollowUser(
 		User{IdUser: requestingUserId}.ToDatabase(),
-		User{IdUser: userToFollowId}.ToDatabase())
+		User{IdUser: targetUserId}.ToDatabase())
 	if err != nil {
-		ctx.Logger.WithError(err).Error("put-follow: error executing insert query")
-		w.WriteHeader(http.StatusInternalServerError)
+		ctx.Logger.WithError(err).Error("follow/db.FollowUser: error executing insert query")
+		w.WriteHeader(http.StatusInternalServerError) // 500 Internal Server Error
 		return
 	}
 
-	// Respond with 204 http status
+	// Respond with 204 No Content: Follow operation successful with no content to return
 	w.WriteHeader(http.StatusNoContent)
 }
