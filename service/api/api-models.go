@@ -5,20 +5,14 @@ import (
 	"wasaphoto-1764024/service/database"
 )
 
-// Error messages
-const INTERNAL_ERROR_MSG = "internal server error"
-const PNG_ERROR_MSG = "file is not a png format"
-const JPG_ERROR_MSG = "file is not a jpg format"
 const IMG_FORMAT_ERROR_MSG = "images must be jpeg or png"
-const INVALID_JSON_ERROR_MSG = "invalid json format"
-const INVALID_IDENTIFIER_ERROR_MSG = "identifier must be a string between 3 and 16 characters"
 
 // JSON Error Structure
 type JSONErrorMsg struct {
 	Message string `json:"message"` // Error messages
 }
 
-// Photo structure for the APIs
+// Photo represents a photo in the API layer
 type Photo struct {
 	Comments []database.CompleteComment `json:"comments"` // Number of comments of a photo
 	Likes    []database.CompleteUser    `json:"likes"`    // Number of likes of a photo
@@ -27,7 +21,7 @@ type Photo struct {
 	Date     time.Time                  `json:"date"`     // Date in which the photo was uploaded
 }
 
-// User structure for the APIs
+// User represents a user in the API layer
 type User struct {
 	IdUser string `json:"user_id"` // User's unique id
 }
@@ -70,14 +64,14 @@ type CompleteProfile struct {
 	Posts     []database.Photo `json:"posts"`
 }
 
-// Converts a User from the api package to a User of the database package
+// Maps the User from the api package to a User of the database package
 func (u User) ToDatabase() database.User {
 	return database.User{
 		IdUser: u.IdUser,
 	}
 }
 
-// Converts a Photo from the api package to a Photo of the database package
+// Maps the Photo from the api package to a Photo of the database package
 func (p Photo) ToDatabase() database.Photo {
 	return database.Photo{
 		Comments: p.Comments,
@@ -88,35 +82,35 @@ func (p Photo) ToDatabase() database.Photo {
 	}
 }
 
-// Converts a PhotoId from the api package to a PhotoId of the database package
+// Maps the PhotoId from the api package to a PhotoId of the database package
 func (p PhotoId) ToDatabase() database.PhotoId {
 	return database.PhotoId{
 		IdPhoto: p.IdPhoto,
 	}
 }
 
-// Converts a PhotoId from the api package to a PhotoId of the database package
+// Maps the Nickname from the api package to a Nickname of the database package
 func (n Nickname) ToDatabase() database.Nickname {
 	return database.Nickname{
 		Nickname: n.Nickname,
 	}
 }
 
-// Converts a Comment from the api package to a Comment of the database package
+// Maps the Comment from the api package to a Comment of the database package
 func (c Comment) ToDatabase() database.Comment {
 	return database.Comment{
 		Comment: c.Comment,
 	}
 }
 
-// Converts a CommentId from the api package to a CommentId of the database package
+// Maps the CommentId from the api package to a CommentId of the database package
 func (c CommentId) ToDatabase() database.CommentId {
 	return database.CommentId{
 		IdComment: c.IdComment,
 	}
 }
 
-// Converts a CompleteComment from the api package to a CompleteComment of the database package
+// Maps the CompleteComment from the api package to a CompleteComment of the database package
 func (cc CompleteComment) ToDatabase() database.CompleteComment {
 	return database.CompleteComment{
 		IdComment: cc.IdComment,

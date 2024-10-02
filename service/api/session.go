@@ -6,8 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"wasaphoto-1764024/service/api/reqcontext"
-
-	"github.com/julienschmidt/httprouter"
 )
 
 // sessionHandler manages the session creation for a user. It processes incoming user data from an HTTP request,
@@ -16,7 +14,7 @@ import (
 // This function ensures proper response codes and messages are sent back to the client depending on the outcome of
 // these operations. Errors are logged and handled gracefully to provide clear feedback for troubleshooting.
 
-func (rt *_router) sessionHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) sessionHandler(w http.ResponseWriter, r *http.Request, ctx reqcontext.RequestContext) {
 
 	w.Header().Set("Content-Type", "application/json")
 

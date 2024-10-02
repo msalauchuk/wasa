@@ -31,6 +31,7 @@ paths:
         content:
           application/json:
             schema:
+              description: Login identifier
               type: object
               required: [username]
               properties:
