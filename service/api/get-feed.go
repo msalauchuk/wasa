@@ -9,37 +9,50 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-// This function retrieves all the photos of the people that the user is following
+// getFeed retrieves all the photos of the people that the user is following.
+// It returns a JSON-encoded array of photos or an empty array if there are no photos to return.
 func (rt *_router) getFeed(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
+	// Set the content type for the response
+
 	w.Header().Set("Content-Type", "application/json")
+
+	// Extract the user ID from the Authorization header (Bearer token)
+
 	identifier := extractBearer(r.Header.Get("Authorization"))
 
-	// A user can only see his/her home
-	valid := validateRequestingUser(ps.ByName("id"), identifier)
-	if valid != 0 {
-		w.WriteHeader(valid)
+	if identifier == "" {
+		ctx.Logger.Error("getFeed: missing or invalid Authorization token")
+		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
-	followers, err := rt.db.GetFollowing(User{IdUser: identifier}.ToDatabase())
+	// Ensure the user is requesting their own feed
+	if validateRequestingUser(ps.ByName("id"), identifier) != 0 {
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+
+	// Retrieve the list of users the requesting user is following
+	followingUsers, err := rt.db.GetFollowing(User{IdUser: identifier}.ToDatabase())
 	if err != nil {
+		ctx.Logger.WithError(err).Error("getFeed: error retrieving following users")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	var photos []database.Photo
-	for _, follower := range followers {
+	for _, followedUser := range followingUsers {
 
-		followerPhoto, err := rt.db.GetPhotosList(
+		userPhotos, err := rt.db.GetPhotosList(
 			User{IdUser: identifier}.ToDatabase(),
-			User{IdUser: follower.IdUser}.ToDatabase())
+			User{IdUser: followedUser.IdUser}.ToDatabase())
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-
-		for i, photo := range followerPhoto {
+		// Add a limited number of photos from the followed user
+		for i, photo := range userPhotos {
 			if i >= database.PhotosPerUserHome {
 				break
 			}
@@ -47,9 +60,10 @@ func (rt *_router) getFeed(w http.ResponseWriter, r *http.Request, ps httprouter
 		}
 
 	}
-
+	// Respond with the collected photos or an empty array if no photos are found
 	w.WriteHeader(http.StatusOK)
-
-	// Send the output to the user. Instead of giving null for no matches return and empty slice of photos. ( ontrollaerrore)
-	_ = json.NewEncoder(w).Encode(photos)
+	if err := json.NewEncoder(w).Encode(photos); err != nil {
+		ctx.Logger.WithError(err).Error("getFeed: error encoding photos to JSON")
+		w.WriteHeader(http.StatusInternalServerError)
+	}
 }
