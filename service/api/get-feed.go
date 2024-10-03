@@ -60,7 +60,7 @@ func (rt *_router) getFeed(w http.ResponseWriter, r *http.Request, ps httprouter
 		}
 
 	}
-	// Respond with the collected photos or an empty array if no photos are found
+	// Respond with the collected photos json or an empty array if no photos are found
 	w.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(w).Encode(photos); err != nil {
 		ctx.Logger.WithError(err).Error("getFeed: error encoding photos to JSON")
