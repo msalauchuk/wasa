@@ -31,7 +31,9 @@ func (db *appdbimpl) UnbanUser(banner User, banned User) error {
 func (db *appdbimpl) BannedUserCheck(requestingUser User, targetUser User) (bool, error) {
 
 	var cnt int
-	err := db.c.QueryRow("SELECT COUNT(*) FROM banned_users WHERE banned = ? AND banner = ?",
+	err := db.c.QueryRow(""+
+		"SELECT COUNT(*) FROM banned_users "+
+		"WHERE banned = ? AND banner = ?",
 		requestingUser.IdUser, targetUser.IdUser).Scan(&cnt)
 
 	if err != nil {
