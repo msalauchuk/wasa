@@ -36,7 +36,7 @@ func extractBearer(authorization string) string {
 // and then ensures the token matches the user's identifier.
 func validateRequestingUser(identifier string, bearerToken string) int {
 
-	// If the requesting user has an invalid token then respond with a fobidden status
+	// If the requesting user has an invalid token then respond with a forbidden status
 	if isNotLogged(bearerToken) {
 		return http.StatusForbidden
 	}
