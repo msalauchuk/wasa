@@ -9,10 +9,22 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-// Function that adds a comment to a photo and sends a response containing the unique id of the created comment
+// postComment adds a comment to a photo and sends a response containing the unique ID of the created comment.
+// It performs the following actions:
+// - Verifies if the user is authenticated and not banned by the photo owner.
+// - Validates the length of the comment.
+// - Inserts the comment into the database.
+// - Returns the unique ID of the comment in the response.
+//
+// Possible HTTP Responses:
+// - 201 Created: The comment has been successfully added.
+// - 400 Bad Request: There is an issue with the request (e.g., invalid data, comment too long).
+// - 403 Forbidden: The user is not authorized to perform this action.
+// - 500 Internal Server Error: An error occurred while processing the request.
 func (rt *_router) postComment(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	w.Header().Set("Content-Type", "application/json")
+
 	photoOwnerId := ps.ByName("id")
 	requestingUserId := extractBearer(r.Header.Get("Authorization"))
 
@@ -21,7 +33,7 @@ func (rt *_router) postComment(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	// Check if the requesting user wasn't banned by the photo owner
+	// Check if the requesting user is banned by the photo owner
 	banned, err := rt.db.BannedUserCheck(
 		User{IdUser: requestingUserId}.ToDatabase(),
 		User{IdUser: photoOwnerId}.ToDatabase())
@@ -31,12 +43,11 @@ func (rt *_router) postComment(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 	if banned {
-		// User was banned by owner, can't post the comment
-		w.WriteHeader(http.StatusForbidden)
+		w.WriteHeader(http.StatusForbidden) //user is banned by photo owner
 		return
 	}
 
-	// Copy body content (comment sent by user) into comment (struct)
+	// decodeComment decodes the JSON request body into a Comment struct.
 	var comment Comment
 	err = json.NewDecoder(r.Body).Decode(&comment)
 	if err != nil {
@@ -45,29 +56,31 @@ func (rt *_router) postComment(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	// Check if the comment has a valid lenght (<=30)
+	// validateCommentLength checks if the comment length is within the allowed limit.
+	// If the length exceeds the limit, it returns an error indicating the comment is too long.
 	if len(comment.Comment) > 30 {
 		w.WriteHeader(http.StatusBadRequest)
-		ctx.Logger.WithError(err).Error("post-comment: comment longer than 30 characters")
+		ctx.Logger.WithError(err).Error("post-comment: comment length exceeds 30 characters")
 		return
 	}
 
-	// Convert the photo identifier from string to int64
-	photo_id_64, err := strconv.ParseInt(ps.ByName("photo_id"), 10, 64)
+	// parsePhotoID converts the photo ID from a string to an int64.
+	// If the conversion fails, it returns an error indicating the photo ID is invalid.
+	photoID, err := strconv.ParseInt(ps.ByName("photo_id"), 10, 64)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		ctx.Logger.WithError(err).Error("post-comment/ParseInt: failed convert photo_id to int64")
+		ctx.Logger.WithError(err).Error("post-comment/ParseInt: failed to parse photo_id to int64")
 		return
 	}
 
 	// Function call to db for comment creation
 	commentId, err := rt.db.CommentPhoto(
-		PhotoId{IdPhoto: photo_id_64}.ToDatabase(),
+		PhotoId{IdPhoto: photoID}.ToDatabase(),
 		User{IdUser: requestingUserId}.ToDatabase(),
 		comment.ToDatabase())
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		ctx.Logger.WithError(err).Error("post-comment/db.CommentPhoto: failed to execute query for insertion")
+		ctx.Logger.WithError(err).Error("post-comment/db.CommentPhoto: failed to insert comment")
 		return
 	}
 
