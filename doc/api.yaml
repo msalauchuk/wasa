@@ -22,7 +22,7 @@ paths:
 
   /session:
     post:
-      tags: [Authentication]
+      tags: [ Authentication ]
       summary: Log in a user
       description: This endpoint registers a new user or logs in an existing one based on the username provided. No password is required. Returns a user identifier for use in subsequent API calls.
       operationId: doLogin
@@ -33,7 +33,7 @@ paths:
             schema:
               description: Login identifier used for authentication
               type: object
-              required: [username]
+              required: [ username ]
               properties:
                 username:
                   description: The username of the user attempting to log in or register.
@@ -87,14 +87,14 @@ paths:
           $ref: '#/components/responses/internalServerError'
 
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
 
   /users/{id}:
     parameters:
       - $ref: '#/components/parameters/userId'
     get:
-      tags: [User]
+      tags: [ User ]
       description: This endpoint retrieves the profile information of the user identified by the provided user ID. The response includes basic user details such as username, nickname, and other relevant profile information.
       summary: Retrieve user profile
       operationId: getUserProfile
@@ -106,9 +106,9 @@ paths:
         500:
           $ref: '#/components/responses/internalServerError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     put:
-      tags: [User]
+      tags: [ User ]
       description: This endpoint allows an authenticated user to update their nickname. The new nickname must meet the specified validation requirements, including length and format.
       summary: Update user nickname
       operationId: setMyUserName
@@ -138,14 +138,14 @@ paths:
         500:
           $ref: '#/components/responses/internalServerError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /users/{id}/home:
     parameters:
       - $ref: '#/components/parameters/userId'
 
     get:
-      tags: [Feed]
+      tags: [ Feed ]
       summary: Obtain the stream
       description: Get all the photos (stream) from the following users
       operationId: getMyStream
@@ -163,7 +163,7 @@ paths:
           $ref: "#/components/responses/internalServerError"
 
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
   /users/{id}/photos:
     post:
       tags: [ Photo ]
@@ -194,7 +194,7 @@ paths:
         500:
           $ref: '#/components/responses/internalServerError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
 
   /users/{id}/photos/{photo_id}:
@@ -202,7 +202,7 @@ paths:
       - $ref: '#/components/parameters/userId'
       - $ref: '#/components/parameters/photoId'
     delete:
-      tags: [Photo]
+      tags: [ Photo ]
       summary: Deletes a specific photo
       description: Deletes a photo that belongs to a user. This operation requires the user to be the owner of the photo.
       operationId: deletePhoto
@@ -218,7 +218,7 @@ paths:
         '500':
           $ref: "#/components/responses/internalServerError"
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     get:
       tags: [ Photo ]
 
@@ -242,7 +242,7 @@ paths:
         '500':
           $ref: "#/components/responses/internalServerError"
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
 
   /users/{id}/photos/{photo_id}/likes/{like_id}:
@@ -251,7 +251,7 @@ paths:
       - $ref: '#/components/parameters/like_id'
       - $ref: '#/components/parameters/photoId'
     put:
-      tags: [Social]
+      tags: [ Social ]
       summary: Like a photo
       description: Adds a like to a specific photo. Each user can like the photo only once.
       operationId: likePhoto
@@ -268,9 +268,9 @@ paths:
         '500':
           $ref: "#/components/responses/internalServerError"
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     delete:
-      tags: [Social]
+      tags: [ Social ]
       summary: Unlike a photo
       description: Removes a like from a specific photo.
       operationId: unlikePhoto
@@ -287,7 +287,7 @@ paths:
         '500':
           $ref: "#/components/responses/internalServerError"
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /users/{id}/photos/{photo_id}/comments:
     parameters:
@@ -328,7 +328,7 @@ paths:
         500:
           $ref: '#/components/responses/internalServerError'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /users/{id}/photos/{photo_id}/comments/{commentId}:
 
@@ -352,14 +352,14 @@ paths:
 
 
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /users/{id}/followers/{followerId}:
     parameters:
       - $ref: '#/components/parameters/userId'
       - $ref: '#/components/parameters/followerId'
     put:
-      tags: [Social]
+      tags: [ Social ]
       summary: Follow a user
       description: Allows an authenticated user to follow another user.
       operationId: followUser
@@ -369,9 +369,9 @@ paths:
         401:
           $ref: '#/components/responses/unauthorized'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
     delete:
-      tags: [Social]
+      tags: [ Social ]
       summary: Unfollow a user
       description: Allows an authenticated user to unfollow another user they are currently following.
       operationId: unfollowUser
@@ -381,7 +381,7 @@ paths:
         401:
           $ref: '#/components/responses/unauthorized'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
   /users/{id}/banned_users/{bannedId}:
     parameters:
@@ -408,7 +408,7 @@ paths:
           $ref: "#/components/responses/internalServerError"
 
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
     delete:
       tags: [ User ]
@@ -429,7 +429,7 @@ paths:
           $ref: "#/components/responses/internalServerError"
 
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
 
 components:
   parameters:
@@ -706,15 +706,19 @@ components:
         application/json:
           schema:
             type: object
+            description: Contains details about the invalid request.
             properties:
               status:
+                description: HTTP status code indicating the error.
                 type: integer
                 example: 400
               error:
                 type: string
+                description: Short message describing the error.
                 example: "Invalid parameters"
               details:
                 type: string
+                description: Detailed message explaining which parameters or fields were invalid.
                 example: "The 'username' field is required."
     notFound:
       description: The requested resource was not found
@@ -722,14 +726,18 @@ components:
         application/json:
           schema:
             type: object
+            description: Contains details about the missing resource.
             properties:
               status:
                 type: integer
+                description: HTTP status code indicating the error.
                 example: 404
               error:
                 type: string
+                description: Short message describing the error.
                 example: "Resource not found"
               details:
+                description: Detailed message explaining what resource was not found.
                 type: string
                 example: "The user with ID 'user123' does not exist."
     unauthorized:
@@ -738,96 +746,125 @@ components:
         application/json:
           schema:
             type: object
+            description: Contains details about the authorization failure.
             properties:
               status:
+                description: HTTP status code indicating the error.
                 type: integer
                 example: 401
               error:
                 type: string
+                description: Short message describing the error.
                 example: "Unauthorized access"
               details:
                 type: string
+                description: Detailed message explaining why the authorization failed.
                 example: "Bearer token is missing or invalid."
     forbidden:
-      description: Access denied (403 Forbidden)
+      description: Access denied due to insufficient permissions (403 Forbidden).
       content:
         application/json:
           schema:
             type: object
+            description: Contains details about the access denial.
             properties:
               status:
                 type: integer
+                description: HTTP status code indicating the error.
                 example: 403
               error:
                 type: string
+                description: Short message describing the error.
                 example: "Access denied"
               details:
                 type: string
+                description: Detailed message explaining why access was denied.
                 example: "You do not have permission to view this resource."
+
     internalServerError:
-      description: Internal server error
+      description: An unexpected internal server error occurred.
       content:
         application/json:
           schema:
             type: object
+            description: Contains details about the server error.
             properties:
               status:
                 type: integer
+                description: HTTP status code indicating the error.
                 example: 500
               error:
                 type: string
+                description: Short message describing the error.
                 example: "Internal server error"
               details:
                 type: string
+                description: Detailed message explaining the nature of the server error.
                 example: "An unexpected error occurred on the server."
+
     userProfile:
-      description: Returns the full profile of the user
+      description: Returns the full profile of the user, including details such as their ID, nickname, and full name.
       content:
         application/json:
           schema:
             type: object
+            description: Contains the details of the user's profile.
             properties:
               status:
                 type: integer
+                description: HTTP status code indicating success.
                 example: 200
               message:
                 type: string
+                description: Message confirming successful retrieval of the user profile.
                 example: "User profile retrieved successfully."
               userId:
                 type: string
+                description: The unique ID of the user.
                 example: "user123"
               nickname:
                 type: string
+                description: The user's nickname.
                 example: "Maria"
               fullName:
                 type: string
+                description: The user's full name.
                 example: "Maria Rossi"
+
     photoUploaded:
-      description: Photo uploaded successfully
+      description: Response indicating that a photo was uploaded successfully.
       content:
         application/json:
           schema:
             type: object
+            description: Contains details about the uploaded photo.
             properties:
               status:
                 type: integer
+                description: HTTP status code indicating success.
                 example: 201
               message:
                 type: string
+                description: Message confirming successful photo upload.
                 example: "Photo uploaded successfully."
               photoId:
                 type: string
+                description: The unique ID of the uploaded photo.
                 example: "photo789"
               url:
                 type: string
+                description: The URL or path to access the uploaded photo.
                 example: "photo789"
+
     feed:
-      description: Contains a list of photos from following users in a reversed chronological order
+      description: Contains a list of photos from following users, displayed in reversed chronological order.
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/photos_list"
+
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
+      description: Authorization scheme that uses Bearer tokens for secure access to resources.
