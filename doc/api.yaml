@@ -699,13 +699,7 @@ components:
   responses:
     noContent:
       description: No content to return
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              message:
-                type: string
+
     badRequest:
       description: Invalid request parameters or body
       content:
