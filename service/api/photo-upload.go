@@ -60,7 +60,7 @@ func (rt *_router) postPhoto(w http.ResponseWriter, r *http.Request, ps httprout
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.WithError(err).Error("photo-upload: unsupported image format")
 		// controllaerrore
-		_ = json.NewEncoder(w).Encode(JSONErrorMsg{Message: IMG_FORMAT_ERROR_MSG})
+		_ = json.NewEncoder(w).Encode(JSONErrorMsg{Message: ImgFormatErrorMsg})
 		return
 	}
 
@@ -128,7 +128,7 @@ func checkFormatPhoto(body io.ReadCloser, newReader io.ReadCloser, ctx reqcontex
 		// Attempt to decode as png if jpeg decoding fails
 		_, errPng := png.Decode(body)
 		if errPng != nil {
-			return errors.New(IMG_FORMAT_ERROR_MSG)
+			return errors.New(ImgFormatErrorMsg)
 		}
 		return nil
 	}

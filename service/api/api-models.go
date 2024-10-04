@@ -5,9 +5,9 @@ import (
 	"wasaphoto-1764024/service/database"
 )
 
-const IMG_FORMAT_ERROR_MSG = "images must be jpeg or png"
+const ImgFormatErrorMsg = "images must be jpeg or png"
 
-// JSON Error Structure
+// JSONErrorMsg JSON Error Structure
 type JSONErrorMsg struct {
 	Message string `json:"message"` // Error messages
 }
@@ -64,14 +64,14 @@ type CompleteProfile struct {
 	Posts     []database.Photo `json:"posts"`
 }
 
-// Maps the User from the api package to a User of the database package
+// ToDatabase Maps the User from the api package to a User of the database package
 func (u User) ToDatabase() database.User {
 	return database.User{
 		IdUser: u.IdUser,
 	}
 }
 
-// Maps the Photo from the api package to a Photo of the database package
+// ToDatabase Maps the Photo from the api package to a Photo of the database package
 func (p Photo) ToDatabase() database.Photo {
 	return database.Photo{
 		Comments: p.Comments,
@@ -82,35 +82,35 @@ func (p Photo) ToDatabase() database.Photo {
 	}
 }
 
-// Maps the PhotoId from the api package to a PhotoId of the database package
+// ToDatabase Maps the PhotoId from the api package to a PhotoId of the database package
 func (p PhotoId) ToDatabase() database.PhotoId {
 	return database.PhotoId{
 		IdPhoto: p.IdPhoto,
 	}
 }
 
-// Maps the Nickname from the api package to a Nickname of the database package
+// ToDatabase Maps the Nickname from the api package to a Nickname of the database package
 func (n Nickname) ToDatabase() database.Nickname {
 	return database.Nickname{
 		Nickname: n.Nickname,
 	}
 }
 
-// Maps the Comment from the api package to a Comment of the database package
+// ToDatabase Maps the Comment from the api package to a Comment of the database package
 func (c Comment) ToDatabase() database.Comment {
 	return database.Comment{
 		Comment: c.Comment,
 	}
 }
 
-// Maps the CommentId from the api package to a CommentId of the database package
+// ToDatabase Maps the CommentId from the api package to a CommentId of the database package
 func (c CommentId) ToDatabase() database.CommentId {
 	return database.CommentId{
 		IdComment: c.IdComment,
 	}
 }
 
-// Maps the CompleteComment from the api package to a CompleteComment of the database package
+// ToDatabase Maps the CompleteComment from the api package to a CompleteComment of the database package
 func (cc CompleteComment) ToDatabase() database.CompleteComment {
 	return database.CompleteComment{
 		IdComment: cc.IdComment,

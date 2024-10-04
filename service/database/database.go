@@ -34,10 +34,8 @@ import (
 	"fmt"
 )
 
-// Custom errors for database operations
 var (
-	ErrPhotoDoesNotExist = errors.New("photo does not exist")
-	ErrUserBanned        = errors.New("user is banned")
+	ErrUserBanned = errors.New("user is banned")
 )
 
 // Constants for operation limits
