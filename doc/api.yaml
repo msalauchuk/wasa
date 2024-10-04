@@ -55,6 +55,8 @@ paths:
                     type: string
                     description: A unique identifier assigned to the user, which can be used for authentication and other operations within the system.
                     example: "user123"
+                    minLength: 3
+                    maxLength: 16
         400:
           $ref: '#/components/responses/badRequest'
         500:
@@ -319,6 +321,9 @@ paths:
                     type: integer
                     description: The unique identifier for the newly added comment.
                     example: 101
+                    minimum: 0
+                    maximum: 9999
+
         400:
           $ref: '#/components/responses/badRequest'
         404:
@@ -470,6 +475,8 @@ components:
         type: integer
         description: Integer identifier for a comment within a post, typically used to manage individual comments.
         example: 101
+        minimum: 0
+        maximum: 9999
 
     followerId:
       name: followerId
@@ -481,6 +488,8 @@ components:
         description: Identifier for the user following another user.
         pattern: '^[a-zA-Z0-9]{3,16}$'
         example: "user456"
+        minLength: 3
+        maxLength: 16
 
     like_id:
       name: like_id
@@ -492,6 +501,9 @@ components:
         description: The user ID of the person who liked the photo.
         pattern: '^[a-zA-Z0-9]{3,16}$'
         example: "Massimo123"
+        minLength: 3
+        maxLength: 16
+
 
     bannedId:
       name: bannedId
@@ -539,11 +551,15 @@ components:
           description: A globally unique identifier for the user.
           pattern: '^[a-zA-Z0-9]{3,16}$'
           example: "User2024"
+          minLength: 3
+          maxLength: 16
         nickname:
           type: string
           description: The nickname chosen by the user.
           pattern: '^[a-zA-Z0-9]{3,16}$'
           example: "NatureLover"
+          minLength: 3
+          maxLength: 16
 
     comment_identifier:
       type: object
@@ -567,11 +583,15 @@ components:
           description: The unique identifier of the user who made the comment.
           pattern: '^[a-zA-Z0-9]{3,16}$'
           example: "User3030"
+          minLength: 3
+          maxLength: 16
         nickname:
           type: string
           description: The nickname of the user who made the comment.
           pattern: '^[a-zA-Z0-9]{3,16}$'
           example: "StarGazer"
+          minLength: 3
+          maxLength: 16
         comment:
           type: string
           description: The text content of the comment made by the user.
@@ -630,6 +650,8 @@ components:
           description: The nickname of the user who uploaded the photo.
           pattern: '^[a-zA-Z0-9]{3,16}$'
           example: "LensMaster"
+          minLength: 3
+          maxLength: 16
 
     photos_list:
       description: Represents a collection of photos uploaded by different users.
