@@ -32,9 +32,9 @@ func (db *appdbimpl) GetFollowers(requestingUser User) ([]User, error) {
 
 // GetFollowing retrieves the list of users that the given user is following.
 // It returns a slice of User and an error, if any occurs.
-func (db *appdbimpl) GetFollowing(requestinUser User) ([]User, error) {
+func (db *appdbimpl) GetFollowing(requestingUser User) ([]User, error) {
 
-	rows, err := db.c.Query("SELECT followed FROM followers WHERE follower = ?", requestinUser.IdUser)
+	rows, err := db.c.Query("SELECT followed FROM followers WHERE follower = ?", requestingUser.IdUser)
 	if err != nil {
 		return nil, err
 	}
@@ -43,12 +43,12 @@ func (db *appdbimpl) GetFollowing(requestinUser User) ([]User, error) {
 	// Iterate over the result set and append each following to the slice.
 	var following []User
 	for rows.Next() {
-		var folowed User
-		err = rows.Scan(&folowed.IdUser)
+		var followed User
+		err = rows.Scan(&followed.IdUser)
 		if err != nil {
 			return nil, err
 		}
-		following = append(following, folowed)
+		following = append(following, followed)
 	}
 
 	if rows.Err() != nil {
