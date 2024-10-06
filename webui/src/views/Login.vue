@@ -1,20 +1,17 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted, getCurrentInstance } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
 
-
+const app = getCurrentInstance()
+const axios = app.appContext.config.globalProperties.$axios
 const router = useRouter()
 const emit = defineEmits(['updatedLoggedChild']);
 const userId = ref('')
 const error = ref(null)
 const isLoading = ref(false)
-const isSubmitDisabled = ref(true)
 
 
 const handeLogin = async() =>{
-	if(isLoading.value) return
-
 	error.value = null // Resetta gli errori precedenti
 	isLoading.value = true  //il caricamento è in corso
 
@@ -28,10 +25,13 @@ const handeLogin = async() =>{
 
 	}catch (err){
 		error.value = err.toString()
-	}finally {
-		isLoading.value = false
 	}
 }
+
+const isButtonDisabled = computed(() => {
+	const trimmedLength = userId.value.trim().length
+	return !userId.value || trimmedLength < 3 || userId.value.length > 16
+})
 
 // Se c'è un token, redireziona alla home
 onMounted(()=>{
@@ -59,11 +59,10 @@ onMounted(()=>{
 						v-model="userId"
 						maxlength="16"
 						minlength="3"
-						placeholder="username"
-						:disabled="isLoading" />
-					<button class="btn btn-dark w-100" :disabled="isLoading || userId.length < 3 || userId.trim().length < 3">
-						<span v-if="isLoading">Loading...</span>
-						<span v-else>Log in</span>
+						placeholder="username"/>
+					<button class="btn btn-dark w-100"
+							:disabled=isButtonDisabled>
+						Log in
 					</button>
 				</form>
 			</div>
