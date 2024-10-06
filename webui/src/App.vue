@@ -1,50 +1,49 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
-</script>
-<script>
-export default {
-	data(){
-		return{
-			logged: false,
-			searchValue: "",
-		}
-	},
-	methods:{
-		logout(newValue){
-			this.logged = newValue
-			this.$router.replace("/login")
-		},
-		updateLogged(newLogged){
-			this.logged = newLogged
-		},
-		updateView(newRoute){
-			this.$router.replace(newRoute)
-		},
-		search(queryParam){
-			this.searchValue= queryParam
-			this.$router.replace("/search")
-		},
-	},
+import { ref, onMounted, onBeforeMount } from 'vue'
+import { useRouter } from 'vue-router'
+import Navbar from './components/Navbar.vue'
 
+const isLoggedIn = ref(false)
+const searchValue = ref("")
 
-	created(){
-		if (!localStorage.getItem('notFirstStart')){
-			localStorage.clear()
-			localStorage.setItem('notFirstStart',true)
-		}
+const router = useRouter()
 
-	},
-
-
-	mounted(){
-
-		if (!localStorage.getItem('token')){
-			this.$router.replace("/login")
-		}else{
-			this.logged = true
-		}
-	},
+const handleLogout = () => {
+	isLoggedIn.value = false
+	router.replace("/login")
 }
+
+const updateLoginStatus = (status) => {
+	isLoggedIn.value = status
+}
+
+const navigateToRoute = (route) => {
+	router.replace(route)
+}
+
+const handleSearch = (queryParam) => {
+	searchValue.value = queryParam
+	router.replace("/search")
+}
+
+
+// Lifecycle hook creazione iniziale
+// Controlla se è la prima volta che l'utente accede e cancella il localStorage se è così
+onBeforeMount(() => {
+	if (!localStorage.getItem('notFirstStart')) {
+		localStorage.clear()
+		localStorage.setItem('notFirstStart', true)
+	}
+})
+
+// Lifecycle hook montaggio del componente
+onMounted(() => {
+	if (!localStorage.getItem('token')) {
+		router.replace("/login") // Se non c'è token, manda al login
+	} else {
+		isLoggedIn.value = true
+	}
+})
 </script>
 
 <template>
@@ -52,14 +51,14 @@ export default {
 		<div class="row">
 			<div class="col p-0">
 				<main >
-					<Navbar v-if="logged"
-					@logoutNavbar="logout"
-					@requestUpdateView="updateView"
-					@searchNavbar="search"/>
+					<Navbar v-if="isLoggedIn"
+					@logoutNavbar="handleLogout"
+					@requestUpdateView="navigateToRoute"
+					@searchNavbar="handleSearch"/>
 
 					<RouterView
-					@updatedLoggedChild="updateLogged"
-					@requestUpdateView="updateView"
+					@updatedLoggedChild="updateLoginStatus"
+					@requestUpdateView="navigateToRoute"
 					:searchValue="searchValue"/>
 				</main>
 			</div>
