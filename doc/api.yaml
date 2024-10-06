@@ -55,6 +55,7 @@ paths:
                     type: string
                     description: A unique identifier assigned to the user, which can be used for authentication and other operations within the system.
                     example: "user123"
+                    pattern: '^.*?$'
                     minLength: 3
                     maxLength: 16
         400:
