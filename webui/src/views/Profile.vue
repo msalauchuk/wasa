@@ -1,170 +1,147 @@
-<script>
-export default {
-	data: function() {
-		return {
-			errormsg: null,
-
-			userExists: false,
-			banStatus: false,
-
-            nickname: "",
+<script setup>
 
 
-			followStatus: false,
-			currentIsBanned: false,
+import { ref, reactive, computed, watch, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useAxios } from '@/services/useAxios'  // Importa il composable useAxios
+import ErrorMsg from '@/components/ErrorMsg.vue'
+import PageNotFound from '@/components/PageNotFound.vue'
+import Photo from '@/components/Photo.vue'
 
-			followerCnt: 0,
-			followingCnt:0,
-			postCnt:0,
+const route = useRoute()
+const router = useRouter()
+const axios = useAxios()  // Usa il composable useAxios
 
-			photos: [],
-            following: [],
-            followers: [],
-		}
-	},
+const errormsg = ref(null)
+const userState = reactive({
+	exists: false,
+	banned: false,
+	currentUserBanned: false,
+	nickname: "",
+	followStatus: false,
+	followerCount: 0,
+	followingCount: 0,
+	postCount: 0,
+	photos: [],
+	following: [],
+	followers: [],
+})
 
-    watch:{
-        currentPath(newid,oldid){
-            if (newid !== oldid){
-                this.loadInfo()
-            }
-        },
-    },
-
-	computed:{
-
-        currentPath(){
-            return this.$route.params.id
-        },
-
-
-		sameUser(){
-			return this.$route.params.id === localStorage.getItem('token')
-		},
-	},
-
-	methods: {
-
-        async uploadFile(){
-            let fileInput = document.getElementById('fileUploader')
-
-            const file = fileInput.files[0];
-            const reader = new FileReader();
-
-            reader.readAsArrayBuffer(file);
-
-            reader.onload = async () => {
-                // Post photo: /users/:id/photos
-                let response = await this.$axios.post("/users/"+this.$route.params.id+"/photos", reader.result, {
-                    headers: {
-                    'Content-Type': file.type
-                    },
-                })
-                //console.log(response)
-                /*
-                this.photos.unshift({
-                    owner: response.data.owner,
-                    date: response.data.date,
-                    photo_id: response.data.photo_id,
-                    likes: response.data.likes,
-                    comments: response.data.comments,
-                })
-                */
-                this.photos.unshift(response.data)
-                this.postCnt += 1
-            };
-        },
-
-		async followClick(){
-            try{
-                if (this.followStatus){
-                    // Delete like: /users/:id/followers/:follower_id
-                    await this.$axios.delete("/users/"+this.$route.params.id+"/followers/"+ localStorage.getItem('token'));
-                    this.followerCnt -=1
-                }else{
-                    // Put like: /users/:id/followers/:follower_id
-                    await this.$axios.put("/users/"+this.$route.params.id+"/followers/"+ localStorage.getItem('token'));
-                    this.followerCnt +=1
-                }
-                this.followStatus = !this.followStatus
-            }catch (e){
-                this.errormsg = e.toString();
-            }
-
-		},
-
-		async banClick(){
-            try{
-                if (this.banStatus){
-                    // Delete ban: /users/:id/banned_users/:banned_id
-                    await this.$axios.delete("/users/"+localStorage.getItem('token')+"/banned_users/"+ this.$route.params.id);
-                    this.loadInfo()
-                }else{
-                    // Put ban: /users/:id/banned_users/:banned_id
-                    await this.$axios.put("/users/"+localStorage.getItem('token')+"/banned_users/"+ this.$route.params.id);
-                    this.followStatus = false
-                }
-                this.banStatus = !this.banStatus
-            }catch(e){
-                this.errormsg = e.toString();
-            }
-		},
-
-		async loadInfo(){
-            if (this.$route.params.id === undefined){
-                return
-            }
-
-			try{
-                // Get user profile: /users/:id
-				let response = await this.$axios.get("/users/"+this.$route.params.id);
-
-                this.banStatus = false
-                this.userExists = true
-                this.currentIsBanned = false
-
-                if (response.status === 206){
-                    this.banStatus = true
-                    return
-                }
-
-				if (response.status === 204){
-					this.userExists = false
-				}
-
-                this.nickname = response.data.nickname
-				this.followerCnt = response.data.followers != null ? response.data.followers.length : 0
-				this.followingCnt = response.data.following != null? response.data.following.length : 0
-				this.postCnt = response.data.posts != null ? response.data.posts.length : 0
-				this.followStatus = response.data.followers != null ? response.data.followers.find(obj => obj.user_id === localStorage.getItem('token')) : false
-                this.photos = response.data.posts != null ? response.data.posts : []
-                this.followers = response.data.followers != null ? response.data.followers : []
-                this.following = response.data.following != null ? response.data.following : []
-
-			}catch(e){
-				this.currentIsBanned = true
-			}
-		},
-
-        goToSettings(){
-            this.$router.push(this.$route.params.id+'/settings')
-        },
-
-        removePhotoFromList(photo_id){
-			this.photos = this.photos.filter(item => item.photo_id !== photo_id)
-		},
-	},
-
-	async mounted(){
-		await this.loadInfo()
-	},
-
+function getToken() {
+	return localStorage.getItem('token')
 }
+
+const currentPath = computed(() => route.params.id)
+const sameUser = computed(() => currentPath.value === getToken())
+
+
+watch(currentPath, (newId, oldId) => {
+	if (newId !== oldId) {
+		loadInfo()
+	}
+})
+
+async function uploadFile(event) {
+	const file = event.target.files[0]
+	if (!file) return
+
+	const reader = new FileReader()
+	reader.onload = async () => {
+		try {
+			const response = await axios.post(`/users/${currentPath.value}/photos`, reader.result, {
+				headers: { 'Content-Type': file.type }
+			})
+			userState.photos.unshift(response.data)
+			userState.postCount++
+		} catch (error) {
+			errormsg.value = error.toString()
+		}
+	}
+	reader.readAsArrayBuffer(file)
+}
+async function toggleFollow() {
+	try {
+		if (userState.followStatus) {
+			await axios.delete(`/users/${currentPath.value}/followers/${getToken()}`)
+			userState.followerCount--
+		} else {
+			await axios.put(`/users/${currentPath.value}/followers/${getToken()}`)
+			userState.followerCount++
+		}
+		userState.followStatus = !userState.followStatus
+	} catch (error) {
+		errormsg.value = error.toString()
+	}
+}
+async function toggleBan() {
+	try {
+		if (userState.banned) {
+			await axios.delete(`/users/${getToken()}/banned_users/${currentPath.value}`)
+			await loadInfo()
+		} else {
+			await axios.put(`/users/${getToken()}/banned_users/${currentPath.value}`)
+			userState.followStatus = false
+		}
+		userState.banned = !userState.banned
+	} catch (error) {
+		errormsg.value = error.toString()
+	}
+}
+
+async function loadInfo() {
+	if (!currentPath.value) return
+
+	try {
+		const response = await axios.get(`/users/${currentPath.value}`)
+
+		userState.banned = false
+		userState.exists = true
+		userState.currentUserBanned = false
+
+		//partial content
+		if (response.status === 206) {
+			userState.banned = true
+			return
+		}
+
+		// no content
+		if (response.status === 204) {
+			userState.exists = false
+			return
+		}
+
+		const { nickname, followers, following, posts } = response.data
+		userState.nickname = nickname
+		userState.followerCount = followers?.length ?? 0
+		userState.followingCount = following?.length ?? 0
+		userState.postCount = posts?.length ?? 0
+		userState.followStatus = followers?.some(f => f.user_id === getToken()) ?? false
+		userState.photos = posts ?? []
+		userState.followers = followers ?? []
+		userState.following = following ?? []
+
+	} catch (error) {
+		userState.currentUserBanned = true
+		errormsg.value = error.toString()
+	}
+}
+
+function goToSettings() {
+	router.push(`${currentPath.value}/settings`)
+}
+
+function removePhotoFromList(photo_id) {
+	userState.photos = userState.photos.filter(photo => photo.photo_id !== photo_id)
+	userState.postCount--
+}
+
+onMounted(loadInfo)
+
 </script>
 
 <template>
 
-    <div class="container-fluid" v-if="!currentIsBanned && userExists">
+    <div class="container-fluid" v-if="!userState.currentUserBanned && userState.exists">
 
         <div class="row">
             <div class="col-12 d-flex justify-content-center">
@@ -173,14 +150,14 @@ export default {
                     <div class="row">
                         <div class="col">
                             <div class="card-body d-flex justify-content-between align-items-center">
-                                <h5 class="card-title p-0 me-auto mt-auto">{{nickname}} @{{this.$route.params.id}}</h5>
+                                <h5 class="card-title p-0 me-auto mt-auto">{{userState.nickname}} @{{currentPath}}</h5>
 
-                                <button v-if="!sameUser && !banStatus" @click="followClick" class="btn btn-success ms-2">
-                                    {{followStatus ? "Unfollow" : "Follow"}}
+                                <button v-if="!sameUser && !userState.banned" @click="toggleFollow" class="btn btn-success ms-2">
+                                    {{userState.followStatus ? "Unfollow" : "Follow"}}
                                 </button>
 
-                                <button v-if="!sameUser" @click="banClick" class="btn btn-danger ms-2">
-                                    {{banStatus ? "Unban" : "Ban"}}
+                                <button v-if="!sameUser" @click="toggleBan" class="btn btn-danger ms-2">
+                                    {{userState.banned ? "Unban" : "Ban"}}
                                 </button>
 
                                 <button v-else class="my-trnsp-btn ms-2" @click="goToSettings">
@@ -191,17 +168,17 @@ export default {
                         </div>
                     </div>
 
-                    <div v-if="!banStatus" class="row mt-1 mb-1">
+                    <div v-if="!userState.banned" class="row mt-1 mb-1">
                         <div class="col-4 d-flex justify-content-start">
-                            <h6 class="ms-3 p-0 ">Posts: {{postCnt}}</h6>
+                            <h6 class="ms-3 p-0 ">Posts: {{userState.postCount}}</h6>
                         </div>
 
                         <div class="col-4 d-flex justify-content-center">
-                            <h6 class=" p-0 ">Followers: {{followerCnt}}</h6>
+                            <h6 class=" p-0 ">Followers: {{userState.followerCount}}</h6>
                         </div>
 
                         <div class="col-4 d-flex justify-content-end">
-                            <h6 class=" p-0 me-3">Following: {{followingCnt}}</h6>
+                            <h6 class=" p-0 me-3">Following: {{userState.followingCount}}</h6>
                         </div>
                     </div>
                 </div>
@@ -234,18 +211,14 @@ export default {
         <div class="row">
             <div class="col">
 
-                <div v-if="!banStatus && postCnt>0">
-                    <Photo v-for="(photo,index) in photos"
-                    :key="index"
-                    :owner="this.$route.params.id"
-                    :photo_id="photo.photo_id"
-                    :comments="photo.comments"
-                    :likes="photo.likes"
-                    :upload_date="photo.date"
-                    :isOwner="sameUser"
-
-                    @removePhoto="removePhotoFromList"
-                    />
+                <div v-if="!userState.banned && userState.postCount>0">
+					<Photo v-for="photo in userState.photos"
+						   :key="photo.photo_id"
+						   :owner="currentPath"
+						   v-bind="photo"
+						   :isOwner="sameUser"
+						   @removePhoto="removePhotoFromList"
+					/>
 
                 </div>
 
@@ -259,10 +232,7 @@ export default {
 
     <ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
     </div>
-    <div v-else class="h-25 ">
-        <PageNotFound />
-    </div>
-
+    <PageNotFound v-else class="h-25 "/>
 
 </template>
 

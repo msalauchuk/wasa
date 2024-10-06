@@ -1,6 +1,7 @@
 import {
     createApp,
-    reactive
+    reactive,
+	provide
 } from 'vue'
 import App from './App.vue'
 import router from './router'
@@ -20,6 +21,8 @@ import './assets/main.css'
 
 const app = createApp(App)
 app.config.globalProperties.$axios = axios;
+app.provide('axios', axios)
+
 
 app.component("ErrorMsg", ErrorMsg);
 app.component("LoadingSpinner", LoadingSpinner);

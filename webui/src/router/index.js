@@ -4,7 +4,7 @@ import {
 } from 'vue-router'
 import Feed from '../views/Feed.vue'
 import Login from '../views/Login.vue'
-import SearchView from '../views/Search.vue'
+import Search from '../views/Search.vue'
 import ProfileView from '../views/Profile.vue'
 import PageNotFoundView from '../views/PageNotFound.vue'
 import SettingsView from '../views/Settings.vue'
@@ -26,7 +26,7 @@ const router = createRouter({
         },
         {
             path: '/search',
-            component: SearchView
+            component: Search
         },
         {
             path: '/users/:id',
