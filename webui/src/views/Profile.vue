@@ -151,7 +151,6 @@ onMounted(loadInfo)
                         <div class="col">
                             <div class="card-body d-flex justify-content-between align-items-center">
                                 <h5 class="card-title p-0 me-auto mt-auto">{{userState.nickname}} @{{currentPath}}</h5>
-
                                 <button v-if="!sameUser && !userState.banned" @click="toggleFollow" class="btn btn-success ms-2">
                                     {{userState.followStatus ? "Unfollow" : "Follow"}}
                                 </button>
