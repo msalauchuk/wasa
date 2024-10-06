@@ -1,119 +1,142 @@
-<script>
-export default {
-  data(){
-    return{
-      textVar: "",
-      iconProfile: "fa-regular", iconHome: "fa-regular"}
-  },
-  methods:{
-    logout(){
-      localStorage.removeItem('token')
-      this.$emit('logoutNavbar',false)
-    },
-    home(){
-      this.$emit('requestUpdateView',"/home")
-    },
-    searchFunc(){
-      this.$emit('searchNavbar',this.textVar)
-      this.textVar=""
-    },
-    myProfile(){
-      this.$emit('requestUpdateView',"/users/"+localStorage.getItem('token'))
-    },
-    profileIconInactive(){
-      this.iconProfile = "fa-regular"
-    },
-    profileIconActive(){
-      this.iconProfile = "fa-solid"
-    },
-	  homeIconInactive() {
-		  this.iconHome = "fa-regular";  // Set home icon to regular
-	  },
-	  homeIconActive() {
-		  this.iconHome = "fa-solid";  // Set home icon to solid when active
-	  }
-  },
+<script setup>
+
+import {ref, computed} from 'vue'
+
+const emit = defineEmits(['logoutNavbar', 'requestUpdateView', 'searchNavbar'])
+
+
+const searchText = ref('')
+const icons = ref({
+	home: 'fa-regular',
+	profile: 'fa-regular'
+})
+
+const userId = computed(() => localStorage.getItem('token'))
+
+
+const handleLogout = () => {
+	localStorage.removeItem('token')
+	emit('logoutNavbar', false)
 }
+
+const navigateTo = (route) => {
+	emit('requestUpdateView', route)
+}
+const handleSearch = () => {
+	if (!searchText.value.trim()) return
+	emit('searchNavbar', searchText.value)
+	searchText.value = ''
+}
+
+const handleIconHover = (icon, isHovered) => {
+	icons.value[icon] = isHovered ? 'fa-solid' : 'fa-regular'
+}
+
+const navigationItems = computed(() => [
+	{
+		icon:' fa-house',
+		action: () => navigateTo('/home'),
+		onHover: (isHovered) => handleIconHover('home', isHovered),
+		class: 'home-icon',
+		noHover: true
+	},
+	{
+		icon: icons.value.profile + ' fa-user',
+		action: () => navigateTo(`/users/${userId.value}`),
+		onHover: (isHovered) => handleIconHover('profile', isHovered),
+		class: 'my-nav-icon-profile'
+	},
+	{
+		icon: 'fa-solid fa-right-from-bracket',
+		action: handleLogout,
+		class: 'my-nav-icon-quit',
+		noHover: true
+	}
+])
 </script>
 
 <template>
-  <nav class="navbar navbar-expand-lg bg-light d-flex justify-content-between sticky-top mb-3 my-nav bg-transparent">
-	  <div class="col-4">
-		  <a class="navbar-brand ms-2 d-flex" @click="home">
-			  <i :class="'home-icon me-1 w-100 h-100 ' + iconHome + ' fa-house'"
-				 @mouseover="homeIconActive" @mouseout="homeIconInactive"></i>
-		  </a>
-	  </div>
 
-      <!-- -->
-      <div class="col-4">
-          <form class="form-inline my-2 my-lg-0 d-flex justify-content-center m-auto">
-              <input class="form-control mr-sm-2 w-50" v-model="textVar" type="search" placeholder="Search users">
-              <button class="btn btn-light ms-2" type="submit" @click.prevent="searchFunc" style="display: none;">Search</button>
-          </form>
-      </div>
+	<!-- Navbar component -->
+	<nav class="navbar navbar-expand-lg sticky-top mb-3 bg-transparent">
+		<div class="container-fluid">
+			<!-- First column: Home icon -->
+			<div class="col-4">
+				<a
+					v-for="(item, index) in navigationItems"
+					:key="index"
+					class="navbar-brand ms-2"
+					@click="item.action"
+					v-show="index === 0"
+				>
+					<i
+						:class="['me-1 w-100 h-100', icons.home, item.icon, item.class]"
+						@mouseover="() => !item.noHover && item.onHover(true)"
+						@mouseout="() => !item.noHover && item.onHover(false)"
+					/>
+				</a>
+			</div>
 
-      <div class="col-4 d-flex justify-content-end">
-          <button @click="myProfile" class="my-trnsp-btn me-2" type="button">
-              <!--Profile-->
-              <i :class="'my-nav-icon-profile me-1 w-100 h-100 '+iconProfile+ ' fa-user'" @mouseover="profileIconActive" @mouseout="profileIconInactive"></i>
-          </button>
+			<!-- Second column: Search bar -->
+			<div class="col-4">
+				<form @submit.prevent="handleSearch" class="d-flex justify-content-center">
+					<input
+						v-model="searchText"
+						class="form-control w-50"
+						type="search"
+						placeholder="Search users"
+					>
+				</form>
+			</div>
 
-          <button @click="logout" class="my-trnsp-btn me-2" type="button">
-              <!--Logout-->
-              <i class="my-nav-icon-quit me-1 w-100 h-100 fa-solid fa-right-from-bracket"></i>
-          </button>
-      </div>
-  </nav>
+			<!-- Third column: Profile and Logout icons -->
+			<div class="col-4 d-flex justify-content-end">
+				<button
+					v-for="(item, index) in navigationItems.slice(1)"
+					:key="index"
+					class="my-trnsp-btn me-2"
+					@click="item.action"
+				>
+					<i
+						:class="['me-1 w-100 h-100', item.icon, item.class]"
+						@mouseover="() => !item.noHover && item.onHover(true)"
+						@mouseout="() => !item.noHover && item.onHover(false)"
+					/>
+				</button>
+			</div>
+		</div>
+	</nav>
 </template>
 
-<style>
-
-.my-nav {
-  background: transparent;
-}
-.my-nav:hover{
-  cursor: pointer;
-}
-
-.navbar-btn {
-    background-color: rgba(235, 79, 79, 0.795);
-    color: grey;
-    border-color: white;
-}
-
-.navbar-elements {
-    color: rgb(231, 152, 47);
-
-}
-.brand-img{
-  height: 30px;
-  width: 30px;
+<style scoped>
+.navbar:hover {
+	cursor: pointer;
 }
 
 .home-icon {
 	font-size: 24px;
-	color: white; /* Default color */
+	color: white;
+	transition: color 0.2s ease;
 }
 
 .home-icon:hover {
 	color: black;
 }
 
-.my-nav-icon-profile{
-  color: black;
-}
-.my-nav-icon-quit{
-  color: black;
-}
-.my-nav-icon-quit:hover{
-  color: var(--color-red-danger);
-  transform: scale(1.2);
+.my-nav-icon-profile,
+.my-nav-icon-quit {
+	color: black;
+	transition: all 0.2s ease;
 }
 
-.my-nav {
-	background: transparent;
-	margin: 30px;
+.my-nav-icon-quit:hover {
+	color: var(--color-red-danger);
+	transform: scale(1.2);
+}
 
+.my-trnsp-btn {
+	background: none;
+	border: none;
+	padding: 0;
 }
 </style>

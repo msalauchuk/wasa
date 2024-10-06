@@ -33,7 +33,7 @@ const isButtonDisabled = computed(() => {
 	return !userId.value || trimmedLength < 3 || userId.value.length > 16
 })
 
-// Se c'è un token, redireziona alla home
+// Se c'è un token, redirection alla home
 onMounted(()=>{
 	if (localStorage.getItem('token')){
 		router.replace('/home')

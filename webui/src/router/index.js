@@ -2,8 +2,8 @@ import {
     createRouter,
     createWebHashHistory
 } from 'vue-router'
-import HomeView from '../views/Feed.vue'
-import LoginView from '../views/Login.vue'
+import Feed from '../views/Feed.vue'
+import Login from '../views/Login.vue'
 import SearchView from '../views/Search.vue'
 import ProfileView from '../views/Profile.vue'
 import PageNotFoundView from '../views/PageNotFound.vue'
@@ -18,11 +18,11 @@ const router = createRouter({
         },
         {
             path: '/login',
-            component: LoginView
+            component: Login
         },
         {
             path: '/home',
-            component: HomeView
+            component: Feed
         },
         {
             path: '/search',
