@@ -197,7 +197,7 @@ const commentsCount = computed(() => allComments.value.length)
 	color: var(--color-red-danger);
 }
 .upload-date-text {
-	font-size: 0.65rem;  /* Ridotto ulteriormente */
+	font-size: 0.7rem;  /* Ridotto ulteriormente */
 	color: #9a9a9a;  /* Colore più chiaro */
 	font-style: italic;
 	font-weight: 300;  /* Font weight più leggero */
@@ -206,6 +206,6 @@ const commentsCount = computed(() => allComments.value.length)
 }
 
 .upload-date-text i {
-	font-size: 0.6rem;  /* Icona leggermente più piccola del testo */
+	font-size: 0.7rem;  /* Icona leggermente più piccola del testo */
 }
 </style>
