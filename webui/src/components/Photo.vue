@@ -14,7 +14,6 @@ const props = defineProps({
 	isOwner: Boolean
 })
 
-console.log('Props ricevute in Photo:', props)
 
 
 const emit = defineEmits(['removePhoto'])

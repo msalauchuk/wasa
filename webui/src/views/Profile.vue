@@ -145,7 +145,6 @@ onMounted(async() => {
 	await loadInfo()
 
 	const message = localStorage.getItem('nicknameUpdateSuccess')
-	console.log('Retrieved from localStorage:', message)
 	if (message) {
 		successMsg.value = message
 		localStorage.removeItem('nicknameUpdateSuccess')

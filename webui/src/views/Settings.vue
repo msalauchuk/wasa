@@ -24,36 +24,27 @@ const isValidNickname = computed(() => {
 })
 
 const modifyNickname = async () => {
-	console.log('modifyNickname function called');
 
 	if (!isValidNickname.value) {
-		console.log('Invalid nickname');
 
 		errormsg.value = "Invalid nickname. Please ensure it is between 3 and 16 characters long."
 		return
 	}
 
 	try {
-		console.log('Sending request to update nickname');
 
 		const response = await axios.put(`/users/${route.params.id}`, {
 			nickname: nickname.value
 		})
 
-		console.log('Response received:', response);
 		if (response.status === 204) {
 			nickname.value = ''
 			errormsg.value = null
 
 
-			console.log('Attempting to save to sessionStorage');
 
-			// Usa sessionStorage invece di localStorage
 			localStorage.setItem('nicknameUpdateSuccess', 'Nickname updated successfully!')
-			console.log('Saved to sessionStorage:', localStorage.getItem('nicknameUpdateSuccess'))
 
-			console.log('Attempting to redirect');
-			// Reindirizza immediatamente
 			router.push(`/users/${route.params.id}`)
 		}
 	} catch (e) {
