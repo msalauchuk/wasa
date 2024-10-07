@@ -119,7 +119,10 @@ async function loadInfo() {
 		userState.followingCount = following?.length ?? 0
 		userState.postCount = posts?.length ?? 0
 		userState.followStatus = followers?.some(f => f.user_id === getToken()) ?? false
-		userState.photos = posts ?? []
+		userState.photos = posts?.map(post => ({
+			...post,
+			upload_date: post.upload_date || post.created_at || new Date().toISOString()
+		})) ?? []
 		userState.followers = followers ?? []
 		userState.following = following ?? []
 
