@@ -1,79 +1,71 @@
-<script>
-export default {
-	data: function() {
-		return {
-			users: [],
-			errormsg: null,
-		}
-	},
+<script setup>
+import { ref, watch, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAxios } from '@/services/useAxios'
+import UserMiniCard from '@/components/UserMiniCard.vue'
+import ErrorMsg from '@/components/ErrorMsg.vue'
 
-	props:['searchValue'],
 
-	watch:{
-		searchValue: function(){
-			this.loadSearchedUsers()
-		},
-	},
+const props = defineProps({
+	searchValue: String
+})
 
-	methods:{
-		async loadSearchedUsers(){
-			this.errormsg = null;
-			if (
-				this.searchValue === undefined ||
-				this.searchValue === "" || 
-				this.searchValue.includes("?") ||
-				this.searchValue.includes("_")){
-				this.users = []
-				return 
-			}
-			try {
-				// Search user (PUT):  "/users"
-				let response = await this.$axios.get("/users",{
-						params: {
-						id: this.searchValue,
-					},
-				});
-				this.users = response.data
+const router = useRouter()
+const axios = useAxios()
 
-			} catch (e) {
-				this.errormsg = e.toString();
-			}
-		},
+const users = ref([])
+const errormsg = ref(null)
+const loadSearchedUsers = async () => {
+	errormsg.value = null
+	users.value = []
 
-		goToProfile(profileId){
-			this.$router.replace("/users/"+profileId)
-		}
-	},
+	if (!props.searchValue || props.searchValue.includes("?") || props.searchValue.includes("_")) {
+		return
+	}
 
-	async mounted(){
-		// Check if the user is logged
-		if (!localStorage.getItem('token')){
-			this.$router.replace("/login")
-		}
-		await this.loadSearchedUsers()
-		
-	},
+	try {
+		const response = await axios.get("/users", {
+			params: { id: props.searchValue }
+		})
+		users.value = response.data
+	} catch (e) {
+		errormsg.value = e.toString()
+	}
 }
+const goToProfile = (profileId) => {
+	router.push(`/users/${profileId}`)
+}
+watch(() => props.searchValue, loadSearchedUsers)
+
+onMounted(async () => {
+	if (!localStorage.getItem('token')) {
+		await router.replace("/login")
+		return
+	}
+	await loadSearchedUsers()
+})
+
 </script>
 
 <template>
 	<div class="container-fluid h-100 ">
-		<UserMiniCard v-for="(user,index) in users" 
-		:key="index"
-		:identifier="user.user_id" 
-		:nickname="user.nickname" 
-		@clickedUser="goToProfile"/>
+		<UserMiniCard
+			v-for="user in users"
+			:key="user.user_id"
+			:identifier="user.user_id"
+			:nickname="user.nickname"
+			@clicked-user="goToProfile"
+		/>
 
-		<p v-if="users.length == 0" class="no-result-text d-flex justify-content-center"> No users found.</p>
-
-		<ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
+		<p v-if="users.length === 0" class="no-result-text d-flex justify-content-center"> No users found.</p>
+		<ErrorMsg v-if="errormsg" :msg="errormsg"/>
 	</div>
 </template>
 
-<style>
-
-.no-result-text{
+<style scoped>
+.no-result-text {
 	color: white;
 	font-style: italic;
+	margin-top: 1rem;
 }
 </style>
