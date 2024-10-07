@@ -16,7 +16,15 @@ const loadStream = async () => {
 		const token = localStorage.getItem('token')
 		const response = await axios.get(`/users/${token}/home`)
 
-		photos.value = response.data || []
+		photos.value = (response.data || []).map(photo => {
+			// Se upload_date non è disponibile, usiamo la data corrente come fallback
+			const upload_date = photo.upload_date ? new Date(photo.upload_date) : new Date()
+			console.log('Data di upload per foto:', photo.photo_id, upload_date)
+			return {
+				...photo,
+				upload_date
+			}
+		})
 	} catch (e) {
 		errormsg.value = e.toString()
 	}

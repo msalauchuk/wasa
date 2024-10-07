@@ -84,9 +84,11 @@ onMounted(async () => {
 })
 
 
+
 const formattedUploadDate = computed(() => {
 	if (!props.upload_date) return 'Data non disponibile'
 	const date = new Date(props.upload_date)
+	if (isNaN(date.getTime())) return 'Data non valida'
 	return date.toLocaleDateString('it-IT', {
 		year: 'numeric',
 		month: 'long',
