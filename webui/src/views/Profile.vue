@@ -27,6 +27,9 @@ const userState = reactive({
 	followers: [],
 })
 
+// cambio nickname
+const successMsg = ref('')
+
 function getToken() {
 	return localStorage.getItem('token')
 }
@@ -135,14 +138,31 @@ function removePhotoFromList(photo_id) {
 	userState.postCount--
 }
 
-onMounted(loadInfo)
+onMounted(async() => {
+	await loadInfo()
+
+	const message = localStorage.getItem('nicknameUpdateSuccess')
+	console.log('Retrieved from localStorage:', message)
+	if (message) {
+		successMsg.value = message
+		localStorage.removeItem('nicknameUpdateSuccess')
+
+		setTimeout(() => {
+			successMsg.value = ''
+		}, 5000)
+	}
+})
 
 </script>
 
 <template>
 
     <div class="container-fluid" v-if="!userState.currentUserBanned && userState.exists">
-
+		<div v-if="successMsg" class="row mt-3">
+			<div class="col-12 d-flex justify-content-center">
+				<div class="alert alert-success">{{ successMsg }}</div>
+			</div>
+		</div>
         <div class="row">
             <div class="col-12 d-flex justify-content-center">
                 <div class="card w-50 container-fluid">

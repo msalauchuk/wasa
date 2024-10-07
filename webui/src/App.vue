@@ -56,10 +56,14 @@ onMounted(() => {
 					@requestUpdateView="navigateToRoute"
 					@searchNavbar="handleSearch"/>
 
-					<RouterView
-					@updatedLoggedChild="updateLoginStatus"
-					@requestUpdateView="navigateToRoute"
-					:searchValue="searchValue"/>
+					<router-view v-slot="{ Component }">
+						<transition name="fade" mode="out-in">
+							<component :is="Component"
+									   @updatedLoggedChild="updateLoginStatus"
+									   @requestUpdateView="navigateToRoute"
+									   :searchValue="searchValue"/>
+						</transition>
+					</router-view>
 				</main>
 			</div>
 		</div>
@@ -67,4 +71,13 @@ onMounted(() => {
 </template>
 
 <style>
+.fade-enter-active,
+.fade-leave-active {
+	transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+	opacity: 0;
+}
 </style>

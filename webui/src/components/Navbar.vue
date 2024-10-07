@@ -34,7 +34,7 @@ const handleIconHover = (icon, isHovered) => {
 
 const navigationItems = computed(() => [
 	{
-		icon:' fa-house',
+		icon:'fa-solid fa-house',
 		action: () => navigateTo('/home'),
 		onHover: (isHovered) => handleIconHover('home', isHovered),
 		class: 'home-icon',

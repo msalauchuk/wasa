@@ -1,45 +1,65 @@
-<script>
-export default {
-	data: function () {
-		return {
-			errormsg: null,
-			nickname: "",
-			successmsg: null,  //success message
+<script setup>
 
+
+import { ref, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useAxios } from '@/services/useAxios'  // Importa il composable useAxios
+import ErrorMsg from '@/components/ErrorMsg.vue'
+
+
+const route = useRoute() // composable
+const axios = useAxios()
+const router = useRouter()
+
+
+const errormsg = ref(null)
+const nickname = ref('')
+
+
+const isValidNickname = computed(() => {
+	return nickname.value &&
+		nickname.value.length >= 3 &&
+		nickname.value.length <= 16 &&
+		nickname.value.trim().length > 0
+})
+
+const modifyNickname = async () => {
+	console.log('modifyNickname function called');
+
+	if (!isValidNickname.value) {
+		console.log('Invalid nickname');
+
+		errormsg.value = "Invalid nickname. Please ensure it is between 3 and 16 characters long."
+		return
+	}
+
+	try {
+		console.log('Sending request to update nickname');
+
+		const response = await axios.put(`/users/${route.params.id}`, {
+			nickname: nickname.value
+		})
+
+		console.log('Response received:', response);
+		if (response.status === 204) {
+			nickname.value = ''
+			errormsg.value = null
+
+
+			console.log('Attempting to save to sessionStorage');
+
+			// Usa sessionStorage invece di localStorage
+			localStorage.setItem('nicknameUpdateSuccess', 'Nickname updated successfully!')
+			console.log('Saved to sessionStorage:', localStorage.getItem('nicknameUpdateSuccess'))
+
+			console.log('Attempting to redirect');
+			// Reindirizza immediatamente
+			router.push(`/users/${route.params.id}`)
 		}
-	},
-
-	methods:{
-
-		// Validation to ensure the nickname meets required criteria
-
-		isValidNickname(nickname) {
-			return nickname && nickname.length >= 3 && nickname.length <= 16 && nickname.trim().length > 0;
-		},
-		async modifyNickname(){
-			if (!this.isValidNickname(this.nickname)) {
-				this.errormsg = "Invalid nickname. Please ensure it is between 3 and 16 characters long.";
-				this.successmsg = null;
-				return;
-			}
-			try{
-				// Nickname put: /users/:id
-				let response = await this.$axios.put("/users/"+this.$route.params.id,{
-					nickname: this.nickname,
-				});
-				if (response.status === 200) {
-					this.nickname = ""; // Clear the input after successful update
-					this.successmsg = "Nickname updated successfully!";
-					this.errormsg = null;
-				}
-
-			} catch (e){
-				this.errormsg = e.toString();
-				this.successmsg = null;
-			}
-		},
-	},
-
+	} catch (e) {
+		console.error('Error updating nickname:', e)
+		errormsg.value = e.response?.data?.message || e.message || "An error occurred"
+	}
 }
 </script>
 
@@ -47,7 +67,7 @@ export default {
 	<div class="container-fluid">
 		<div class="row">
 			<div class="col d-flex justify-content-center mb-2">
-				<h1>{{ this.$route.params.id }}'s Settings</h1>
+				<h1>{{route.params.id }}'s Settings</h1>
 			</div>
 		</div>
 
@@ -71,7 +91,7 @@ export default {
 					<div class="input-group-append">
 						<button class="btn btn-outline-secondary"
 								@click="modifyNickname"
-								:disabled="!isValidNickname(nickname)">
+								:disabled="!isValidNickname">
 							Modify
 						</button>
 					</div>
@@ -79,17 +99,11 @@ export default {
 			</div>
 		</div>
 
-		<!-- Display success message -->
-		<div class="row" v-if="successmsg">
-			<div class="col d-flex justify-content-center">
-				<div class="alert alert-success">{{ successmsg }}</div>
-			</div>
-		</div>
 
 		<!-- Display nickname preview -->
 		<div class="row">
 			<div v-if="nickname.trim().length > 0" class="col d-flex justify-content-center">
-				Preview: {{ nickname }} @{{ this.$route.params.id }}
+				Preview: {{ nickname }} @{{route.params.id }}
 			</div>
 		</div>
 
