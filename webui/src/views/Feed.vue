@@ -1,50 +1,44 @@
-<script>
-export default {
-	data: function () {
-		return {
-			errormsg: null,
-			photos: [],
-		}
-	},
+<script setup>
+import { ref, onMounted } from 'vue'
+import { useAxios } from '@/services/useAxios'
+import ErrorMsg from '@/components/ErrorMsg.vue'
+import Photo from '@/components/Photo.vue'
 
-	methods: {
-		
-		async loadStream() {
-			try {
-				this.errormsg = null
-				// Home get: "/users/:id/home"
-				let response = await this.$axios.get("/users/" + localStorage.getItem('token') + "/home")
 
-				if (response.data != null){
-					this.photos = response.data
-				}
-				
-			} catch (e) {
-				this.errormsg = e.toString()
-			}
-		}
-	},
 
-	async mounted() {
-		await this.loadStream()
+const axios = useAxios()
+
+const errormsg = ref(null)
+const photos = ref([])
+const loadStream = async () => {
+	try {
+		errormsg.value = null
+		const token = localStorage.getItem('token')
+		const response = await axios.get(`/users/${token}/home`)
+
+		photos.value = response.data || []
+	} catch (e) {
+		errormsg.value = e.toString()
 	}
-
 }
+
+onMounted(loadStream)
+
 </script>
 
 <template>
 	<div class="container-fluid">
-		<ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
+		<ErrorMsg v-if="errormsg" :msg="errormsg"/>
 
 		<div class="row">
 			<Photo
-				v-for="(photo,index) in photos"
-				:key="index"
+				v-for="photo in photos"
+				:key=" photo.photo_id"
 				:owner="photo.owner"
 				:photo_id="photo.photo_id"
-				:comments="photo.comments != nil ? photo.comments : []"
-				:likes="photo.likes != nil ? photo.likes : []"
-				:upload_date="photo.date"
+				:comments="photo.comments ?? []"
+				:likes="photo.likes ?? []"
+				:upload_date="photo.upload_date"
 			/>
 		</div>
 
