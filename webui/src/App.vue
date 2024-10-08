@@ -99,8 +99,13 @@ onUnmounted(() => {
 .fade-leave-to {
 	opacity: 0;
 }
-/* Stile per prevenire lo spostamento dovuto alla barra di scorrimento */
+:root {
+	--scrollbar-width: 0px;
+}
+
 body {
 	overflow-y: scroll;
+	padding-right: var(--scrollbar-width);
 }
+
 </style>
