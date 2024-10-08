@@ -113,6 +113,7 @@ async function loadInfo() {
 			return
 		}
 
+
 		const { nickname, followers, following, posts } = response.data
 		userState.nickname = nickname
 		userState.followerCount = followers?.length ?? 0
@@ -121,7 +122,7 @@ async function loadInfo() {
 		userState.followStatus = followers?.some(f => f.user_id === getToken()) ?? false
 		userState.photos = posts?.map(post => ({
 			...post,
-			upload_date: new Date(post.upload_date || post.created_at || new Date())
+			date: new Date(post.date || post.upload_date || new Date())
 		})) ?? []
 		userState.followers = followers ?? []
 		userState.following = following ?? []
@@ -238,6 +239,7 @@ onMounted(async() => {
 						   :owner="currentPath"
 						   v-bind="photo"
 						   :isOwner="sameUser"
+						   :upload_date="photo.date"
 						   @removePhoto="removePhotoFromList"
 					/>
 

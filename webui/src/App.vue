@@ -58,6 +58,7 @@ onMounted(() => {
 
 					<router-view v-slot="{ Component }">
 						<transition name="fade" mode="out-in">
+							<!-- rendering dinamico della componente v-bind:is -->
 							<component :is="Component"
 									   @updatedLoggedChild="updateLoginStatus"
 									   @requestUpdateView="navigateToRoute"
