@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onBeforeMount } from 'vue'
+import { ref, onMounted, onBeforeMount, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import Navbar from './components/Navbar.vue'
 
@@ -27,6 +27,14 @@ const handleSearch = (queryParam) => {
 }
 
 
+// prevenire lo spostamento dovuto alla barra di scorrimento
+const preventScrollShift = () => {
+	const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth
+	document.documentElement.style.setProperty('--scrollbar-width', `${scrollbarWidth}px`)
+}
+
+
+
 // Lifecycle hook creazione iniziale
 // Controlla se è la prima volta che l'utente accede e cancella il localStorage se è così
 onBeforeMount(() => {
@@ -34,6 +42,8 @@ onBeforeMount(() => {
 		localStorage.clear()
 		localStorage.setItem('notFirstStart', true)
 	}
+
+
 })
 
 // Lifecycle hook montaggio del componente
@@ -43,6 +53,14 @@ onMounted(() => {
 	} else {
 		isLoggedIn.value = true
 	}
+	// Previeni lo spostamento dovuto alla barra di scorrimento
+	preventScrollShift()
+	window.addEventListener('resize', preventScrollShift)
+})
+
+// Lifecycle hook smontaggio del componente
+onUnmounted(() => {
+	window.removeEventListener('resize', preventScrollShift)
 })
 </script>
 
@@ -80,5 +98,9 @@ onMounted(() => {
 .fade-enter-from,
 .fade-leave-to {
 	opacity: 0;
+}
+/* Stile per prevenire lo spostamento dovuto alla barra di scorrimento */
+body {
+	overflow-y: scroll;
 }
 </style>
