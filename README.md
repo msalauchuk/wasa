@@ -4,9 +4,7 @@ A photo-sharing web application built with **Go**, **Vue 3**, **SQLite**, and **
 
 ## Overview
 
-WASAphoto separates application logic, data persistence, and presentation into distinct components. The Go service exposes HTTP endpoints backed by SQLite, while a Vue 3 single-page application communicates with the API through Axios. An OpenAPI 3 specification documents the HTTP interface.
-
-This repository is a **software prototype**, not a production-hosted service.
+WASAphoto separates application logic, data persistence, and presentation into distinct components. The Go service exposes HTTP endpoints backed by SQLite, while a Vue 3 single-page application communicates with the API through Axios. An OpenAPI 3 specification documents the HTTP interface. Not a production-hosted service.
 
 ## Features
 
@@ -110,12 +108,13 @@ By default, the service listens on port `3000` and uses a SQLite database under 
 └── docker-compose.yml
 ```
 
-## Implementation Notes and Limitations
+## Scope and Limitations
 
-- **Authentication is simplified:** a username-based session returns an identifier used as a bearer value. This is suitable for demonstrating application flows, **not** secure authentication for a public service.
-- **Persistence is local:** the backend uses SQLite and filesystem image storage rather than managed storage or a distributed database.
-- **Deployment is demonstrative:** Docker Compose runs the frontend and backend locally; it does not define a production-ready deployment architecture.
-- The source includes a vendored Go dependency directory and a local `webui/node_modules/` directory in the provided archive. Those are development artifacts rather than application features.
+This project is a full-stack application prototype focused on RESTful API design, backend development, data persistence, and containerized deployment.
+
+The current implementation uses SQLite for data persistence, local filesystem storage for uploaded images, and Docker Compose for local execution.
+
+Authentication is simplified for demonstration purposes and is not suitable for deployment as a public-facing service without additional security measures.
 
 ## License
 
