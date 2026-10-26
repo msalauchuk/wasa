@@ -1,13 +1,15 @@
-/bin/
-/pkg/
-/src/
-.idea/
-*.iml
-*.exe
-.DS_Store
+# Node.js
+**/node_modules/
+**/dist/
+
+# Runtime data
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
 .env
-*.wiki.git
-docker-compose.log
-/doc/html
-/doc/json
-/doc/markdown
+
+# IDE
+.idea/
+.vscode/
+.DS_Store
