@@ -9,6 +9,8 @@
 *.sqlite3
 .env
 
+/vendor/
+
 # IDE
 .idea/
 .vscode/
